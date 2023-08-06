@@ -1,1 +1,1 @@
-# SEA-ME_Embedded
+# SEA-ME_Main
