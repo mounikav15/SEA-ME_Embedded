@@ -8,6 +8,12 @@ Tested on the following distributions:
 
 * Ubuntu Server 22.04.1 LTS (64-Bit)
 
+If wifi is not working add
+
+    sudo ip link set wlan0 up
+    sudo iw wlan0 scan
+    sudo apt-get update
+
 
 ### Add additional sources
 
@@ -39,7 +45,11 @@ Disable the unattended upgrade feature by running the following command to disab
         raspi-config \
         python3-dev \
         python3-setuptools \
-        libopencv-dev
+        libopencv-dev \
+        net-tools \
+        python3-pip
+    sudo apt upgrade
+    sudo reboot
 
 ### Setup periphery 
 

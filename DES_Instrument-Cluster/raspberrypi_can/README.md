@@ -147,6 +147,10 @@ dtparam=spi=on
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=25
 dtoverlay=mcp2515-can0,oscillator=16000000,interrupt=23
 dtoverlay=spi-bcm2835-overlay
+dtparam=spi=on
+dtoverlay=spi1-3cs
+dtoverlay=mcp251xfd,spi0-0,interrupt=25
+dtoverlay=mcp251xfd,spi1-0,interrupt=24
 ```
 
 * Save and exit, then restart your Pi:
@@ -164,8 +168,8 @@ sudo dmesg | grep spi
 
 * Set up CAN:
 ```bash
-sudo ip link set can0 up type can bitrate 1000000
-sudo ip link set can1 up type can bitrate 1000000
+sudo ip link set can0 up type can bitrate 500000
+sudo ip link set can1 up type can bitrate 500000
 sudo ifconfig can0 txqueuelen 65536
 sudo ifconfig can1 txqueuelen 65536
 ```
