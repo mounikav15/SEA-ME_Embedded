@@ -90,7 +90,7 @@ int main (int argc, char **argv)
 
         char *s;
         if (dbus_message_get_args (reply, &dbus_error, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID)) {
-            printf ("%s\\n", s);
+            printf ("%s\n", s);
         }
         else {
              fprintf (stderr, "Did not get arguments in reply\\n");
