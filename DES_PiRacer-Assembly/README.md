@@ -1,14 +1,7 @@
 # **DES Project - PiRacer Assembly**
 
-- [**DES Project - PiRacer Assembly** (PiRacer / PiRacerPro / PiRacerEvo / PiRacerMicro)]
-  - [Project Description](#project-description)
-  - [Project Requirements](#project-requirements)
-  - [Project Usage](#usage)
-
 ## Result
-
-<img src="https://github.com/dongdongO/SEA-ME_Main/assets/97011426/74fb0d1e-f4e8-445b-b459-4079252077cf" width="30%" height="30%"/>
-
+![Alt text](<Images/result_image.png>)
 
 ## Project Description
 
