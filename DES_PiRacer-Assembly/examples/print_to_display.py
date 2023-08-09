@@ -4,7 +4,6 @@ import pathlib
 import time
 import socket
 import threading
-import keyboard
 from piracer.vehicles import PiRacerBase, PiRacerStandard
 
 FILE_DIR = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
@@ -48,8 +47,6 @@ if __name__ == '__main__':
     # Start the display thread
     display_thread = threading.Thread(target=print_battery_report, args=(piracer, stop_event))
     display_thread.start()
-
-    keyboard.add_hotkey('shift+g', lambda: stop_event.set())  # Stop the thread when 'Ctrl+P' is pressed.
 
     display_thread.join()  # Wait for the display thread to finish.
 
