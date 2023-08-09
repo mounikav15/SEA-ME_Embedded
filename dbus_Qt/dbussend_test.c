@@ -1,4 +1,3 @@
-# Modify the provided C code to send a fixed double value (10.0) for speed
 
 #include <stdio.h>
 #include <stdlib.h>
