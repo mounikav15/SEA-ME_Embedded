@@ -6,14 +6,67 @@ Tested on the following Hardware:
 
 Tested on the following distributions:      
 
-* Ubuntu Server 22.04.1 LTS (64-Bit)
+* Rasbian Lite(Server) 64-Bit : latest version but update raspi-firmware version 5.15.84
 
-If wifi is not working add
+### Basic Wi-Fi setting
 
-    sudo ip link set wlan0 up
-    sudo iw wlan0 scan
-    sudo apt-get update
+If you know the Wi-Fi ssid and access password, you can add the following to the "wpa_supplicant.conf" file. 
+Change my_ssid to your wifi's ssid and my_password to your own Wi-Fi access password.
+You can edit the "wpa_supplicant.conf" file with the command below
 
+```bash
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+```
+
+```bash
+network={
+	ssid="my_ssid"
+	psk="my_password"
+}
+```
+ 
+If the ssid of my wireless router is iptime123 and the connection password is abcd1111, the final wpa_supplicant.conf file will look like the following.
+```bash
+pi@raspberrypi:~ $ cat /etc/wpa_supplicant/wpa_supplicant.conf
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=GB
+
+network={
+	ssid="iptime123"
+	psk="abcd1111"
+}
+```
+
+After confirming that the file was saved normally, reboot with the command below.
+
+```bash
+sudo reboot
+```
+ 
+When the reboot is complete, check if the Wi-Fi connection is normal with the command below. If the IP is assigned to the wlan0 item, it is normally connected. (IP varies depending on your router settings.)
+
+```bash
+pi@raspberrypi:~ $ ifconfig
+wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.6  netmask 255.255.255.0  broadcast 192.168.1.255
+```
+
+
+## Update the Raspberrypi Firmware
+
+##### When Update firmware, you need to choose stable version
+##### [Rpi-firmware](https://github.com/raspberrypi/rpi-firmware)
+
+We choose 5.15.84. You can check the version in commits.
+
+```bash
+sudo apt-get update
+sudo apt-get dist-upgrade
+sudo reboot
+sudo rpi-update (firmware_version)
+sudo reboot
+```
 
 ### Add additional sources
 
@@ -46,7 +99,6 @@ Disable the unattended upgrade feature by running the following command to disab
         python3-dev \
         python3-setuptools \
         libopencv-dev \
-        net-tools \
         python3-pip
     sudo apt upgrade
     sudo reboot
