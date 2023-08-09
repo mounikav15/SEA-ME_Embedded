@@ -35,5 +35,5 @@ if __name__ == '__main__':
     loop = GLib.MainLoop()
     print("Service Running...")
     while True:
-        battery = float(input("Enter the remaining battery level: "))  # Convert input to float
+        battery = 80.0  # Convert input to float
         print(object.send_battery_info(battery))
