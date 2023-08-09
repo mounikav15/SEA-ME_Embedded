@@ -2,6 +2,7 @@ import dbus
 import dbus.service
 import dbus.mainloop.glib
 from gi.repository import GLib
+import time
 
 class ExampleService(dbus.service.Object):
     def __init__(self):
@@ -36,4 +37,5 @@ if __name__ == '__main__':
     print("Service Running...")
     while True:
         battery = 80.0  # Convert input to float
+        time.sleep(1)
         print(object.send_battery_info(battery))
