@@ -32,7 +32,7 @@ int main (int argc, char **argv)
         exit(1);
 
     while (1) {
-        double speed_value = 10.0;
+        int speed_value = 10;
 
         while (1) {
             ret = dbus_bus_request_name (conn, CLIENT_BUS_NAME, 0, &dbus_error);  
