@@ -10,20 +10,20 @@ public:
     explicit CarInformation(QObject *parent = nullptr);
 
 public Q_SLOTS:
-    QString setSpeed(qreal speed);
+    QString setSpeed(qint16 speed);
     QString setBattery(qreal battery);
     QString setGear(qreal gear);
-    QString setRpm(qreal rpm);
+    QString setRpm(qint16 rpm);
     qreal getSpeed();
     qreal getBattery();
     qreal getGear();
     qreal getRpm();
 
 private:
-    int speed;
+    qint16 speed;
     double battery;
     char gear;
-    double rpm;
+    qint16 rpm;
 };
 
 #endif // CARINFORMATION_H
