@@ -5,7 +5,7 @@ CarInformation::CarInformation(QObject *parent) : QObject(parent)
 {
     speed = 0;
     battery = 0.0;
-    gear = "P";
+    gear = 'p';
 }
 
 QString CarInformation::setSpeed(qreal speed)

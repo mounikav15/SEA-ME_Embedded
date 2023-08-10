@@ -98,7 +98,7 @@ int main (int argc, char **argv)
 
         dbus_pending_call_unref(pending_return_speed);  
 
-        /*
+        
         char *reply_msg_speed;
         if (dbus_message_get_args(reply_speed, &dbus_error, DBUS_TYPE_STRING, &reply_msg_speed, DBUS_TYPE_INVALID)) 
         {
@@ -109,7 +109,7 @@ int main (int argc, char **argv)
             fprintf(stderr, "Did not get arguments in reply for setSpeed\n");
             exit(1);
         }
-        */
+        
 
         dbus_message_unref(reply_speed);  
 
@@ -117,7 +117,7 @@ int main (int argc, char **argv)
 
         DBusMessage *request_rpm;
         if ((request_rpm = dbus_message_new_method_call(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, 
-                        INTERFACE_NAME, "setRPM")) == NULL) 
+                        INTERFACE_NAME, "setRpm")) == NULL) 
         {
             fprintf(stderr, "Error in dbus_message_new_method_call for setRPM\n");
             exit(1);
@@ -158,7 +158,7 @@ int main (int argc, char **argv)
 
         dbus_pending_call_unref(pending_return_rpm);  
 
-        /*
+        
         char *reply_msg_rpm;
         if (dbus_message_get_args(reply_rpm, &dbus_error, DBUS_TYPE_STRING, &reply_msg_rpm, DBUS_TYPE_INVALID)) 
         {
@@ -169,7 +169,7 @@ int main (int argc, char **argv)
             fprintf(stderr, "Did not get arguments in reply for setRPM\n");
             exit(1);
         }
-        */
+        
 
         dbus_message_unref(reply_rpm);  
 
