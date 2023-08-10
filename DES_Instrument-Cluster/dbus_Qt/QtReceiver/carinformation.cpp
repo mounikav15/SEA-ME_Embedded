@@ -5,6 +5,7 @@ CarInformation::CarInformation(QObject *parent) : QObject(parent)
 {
     speed = 0;
     battery = 0.0;
+    gear = "P";
 }
 
 QString CarInformation::setSpeed(qreal speed)
@@ -21,6 +22,12 @@ QString CarInformation::setBattery(qreal battery)
     return "Get Battery";
 }
 
+QString CarInformation::setGear(qreal gear)
+{
+    this->gear = gear;
+    qDebug() << "Receive Gear Data : " << gear;
+    return "Get Gear";
+}
 
 qreal CarInformation::getSpeed()
 {
@@ -30,4 +37,9 @@ qreal CarInformation::getSpeed()
 qreal CarInformation::getBattery()
 {
     return battery;
+}
+
+qreal CarInformation::getGear()
+{
+    return gear;
 }
