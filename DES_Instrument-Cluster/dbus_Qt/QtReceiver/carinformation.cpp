@@ -29,6 +29,13 @@ QString CarInformation::setGear(qreal gear)
     return "Get Gear";
 }
 
+QString CarInformation::setRpm(qreal rpm)
+{
+    this->rpm = rpm;
+    qDebug() << "Receive Rpm Data : " << rpm;
+    return "Get Rpm";
+}
+
 qreal CarInformation::getSpeed()
 {
     return speed;
@@ -42,4 +49,9 @@ qreal CarInformation::getBattery()
 qreal CarInformation::getGear()
 {
     return gear;
+}
+
+qreal CarInformation::getRpm()
+{
+    return rpm;
 }

@@ -13,14 +13,17 @@ public Q_SLOTS:
     QString setSpeed(qreal speed);
     QString setBattery(qreal battery);
     QString setGear(qreal gear);
+    QString setRpm(qreal rpm);
     qreal getSpeed();
     qreal getBattery();
     qreal getGear();
+    qreal getRpm();
 
 private:
     int speed;
     double battery;
     char gear;
+    double rpm;
 };
 
 #endif // CARINFORMATION_H
