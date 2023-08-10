@@ -179,7 +179,7 @@ int main (int argc, char **argv)
              exit (1);
         }
 
-//        sleep(1);
+        sleep(1);
     }
 
     return 0;
