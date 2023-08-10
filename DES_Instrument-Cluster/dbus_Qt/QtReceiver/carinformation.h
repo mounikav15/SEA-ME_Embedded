@@ -20,7 +20,7 @@ public Q_SLOTS:
     qreal getRpm();
 
 private:
-    int16_t speed;
+    int speed;
     double battery;
     char gear;
     double rpm;
