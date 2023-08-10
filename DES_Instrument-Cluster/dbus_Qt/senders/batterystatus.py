@@ -6,10 +6,10 @@ import time
 
 from piracer.vehicles import PiRacerStandard
 
-def get_battery_status(battery_voltage, battery_current):
-    battery_status = 0.0
+def get_battery_status(battery_voltage):
+    battery_status = (battery_voltage - 2.8 * 3.0) / (12.3 - 2.8 * 3.0) * 100.0
 
-    # Need equation for calculate leftover battery
+    # Equation for calculate leftover battery
 
     return battery_status
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         gear_status = piracer.get_movement_status()
         # power_consumption = piracer.get_power_consumption()
 
-        battery = get_battery_status(battery_voltage, battery_current)
+        battery = get_battery_status(battery_voltage)
         
         # Convert input to float
         time.sleep(1)
