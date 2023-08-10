@@ -6,6 +6,7 @@
 class CarInformation : public QObject
 {
     Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.team4.Des02.CarInformation")
 public:
     explicit CarInformation(QObject *parent = nullptr);
 

@@ -3,7 +3,7 @@
   <interface name="org.team4.Des02.CarInformation">
     <method name="setSpeed">
       <arg type="s" direction="out"/>
-      <arg name="speed" type="d" direction="in"/>
+      <arg name="speed" type="n" direction="in"/>
     </method>
     <method name="setBattery">
       <arg type="s" direction="out"/>
@@ -15,7 +15,7 @@
     </method>
     <method name="setRpm">
       <arg type="s" direction="out"/>
-      <arg name="rpm" type="d" direction="in"/>
+      <arg name="rpm" type="n" direction="in"/>
     </method>
     <method name="getSpeed">
       <arg type="d" direction="out"/>

@@ -8,7 +8,7 @@ CarInformation::CarInformation(QObject *parent) : QObject(parent)
     gear = 'p';
 }
 
-QString CarInformation::setSpeed(qreal speed)
+QString CarInformation::setSpeed(qint16 speed)
 {
     this->speed = speed;
     qDebug() << "Receive Speed Data : " << speed;
@@ -29,7 +29,7 @@ QString CarInformation::setGear(qreal gear)
     return "Get Gear";
 }
 
-QString CarInformation::setRpm(qreal rpm)
+QString CarInformation::setRpm(qint16 rpm)
 {
     this->rpm = rpm;
     qDebug() << "Receive Rpm Data : " << rpm;
