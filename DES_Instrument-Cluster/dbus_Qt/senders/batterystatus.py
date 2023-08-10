@@ -63,6 +63,7 @@ if __name__ == '__main__':
 
     loop = GLib.MainLoop()
     print("Service Running...")
+
     while True:
         battery_voltage = piracer.get_battery_voltage()
         battery_current = piracer.get_battery_current()
@@ -70,7 +71,8 @@ if __name__ == '__main__':
         # power_consumption = piracer.get_power_consumption()
 
         battery = get_battery_status(battery_voltage, battery_current)
-          # Convert input to float
+        
+        # Convert input to float
         time.sleep(1)
         object.send_battery_info(battery)
         object.send_gear_info(gear_status)
