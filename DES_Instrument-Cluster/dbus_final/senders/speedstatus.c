@@ -22,9 +22,9 @@
 // CAN setting
 int soc;
 
-int open_port(const char *port)
-void read_port(uint8_t *speed, uint8_t *rpm)
-int close_port()
+int open_port(const char *port);
+void read_port(uint8_t *speed, uint8_t *rpm);
+int close_port();
 
 // Dbus setting
 const char *const INTERFACE_NAME = "org.team4.Des02.CarInformation";
