@@ -267,7 +267,7 @@ void read_port(uint8_t *speed, uint8_t *rpm)
             if (recvbytes)
             {
                 int disk_rpm = (frame.data[0] << 8) + frame.data[1];
-                *rpm = (uint8)((float)disk_rpm / 2.6);
+                *rpm = (uint8_t)((float)disk_rpm / 2.6);
                 *speed = (uint8_t)(*rpm * 0.0034);
             }
         }
