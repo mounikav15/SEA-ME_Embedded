@@ -270,6 +270,8 @@ void read_port(uint8_t *speed, uint8_t *rpm)
                 // *rpm = (uint8_t)((float)disk_rpm / 2.6);
                 // *speed = (uint8_t)(*rpm * 0.0034);
 
+               printf("Raw data: %x %x\n", frame.data[0], frame.data[1]);
+
                 *rpm = (uint8_t)(disk_rpm);
                 *speed = (uint8_t)(disk_rpm);
 
