@@ -202,7 +202,7 @@ int main (int argc, char **argv)
              exit (1);
         }
 
-        sleep(1);
+        // sleep(1);
     }
 
     close_port();
@@ -263,19 +263,14 @@ void read_port(uint8_t *speed, uint8_t *rpm)
         if (FD_ISSET(soc, &readSet))
         {
             recvbytes = read(soc, &frame, sizeof(struct can_frame));
-            printf("Received bytes: %d\n", recvbytes);
+            
+            // printf("Received bytes: %d\n", recvbytes);
+            // printf("Raw data: %x %x\n", frame.data[0], frame.data[1]);
             if (recvbytes)
             {
                 int disk_rpm = (frame.data[0] << 8) + frame.data[1];
-                // *rpm = (uint8_t)((float)disk_rpm / 2.6);
-                // *speed = (uint8_t)(*rpm * 0.0034);
-
-               printf("Raw data: %x %x\n", frame.data[0], frame.data[1]);
-
-                *rpm = (uint8_t)(disk_rpm);
-                *speed = (uint8_t)(disk_rpm);
-
-                printf("Car RPM: %d\n", *rpm);
+                *rpm = (uint8_t)((float)disk_rpm / 2.6);
+                *speed = (uint8_t)(*rpm * 0.0034);
             }
         }
     }
