@@ -270,7 +270,7 @@ void read_port(uint8_t *speed, uint8_t *rpm)
                 *rpm = (uint8_t)((float)disk_rpm / 2.6);
                 *speed = (uint8_t)(*rpm * 0.0034);
 
-                printf("Car RPM: %d\t Car Speed: %d m/s\n", rpm, speed);
+                printf("Car RPM: %d\n", rpm);
             }
         }
     }
