@@ -38,10 +38,10 @@ class ExampleService(dbus.service.Object):
 
         return battery
     
-    '''
+
     # Corresponds to INTERFACE_NAME in C code
     @dbus.service.method('org.team4.Des02.CarInformation')
-    def send_gear_info(self, gear: dbus.Char) -> dbus.Char:
+    def send_gear_info(self, gear: dbus.Byte) -> dbus.Byte:
         # Create a new method call message
         # dbus.lowlevel.MethodCallMessage(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, METHOD_NAME)
         msg = dbus.lowlevel.MethodCallMessage("org.team4.Des02", "/CarInformation", "org.team4.Des02.CarInformation", "setGear")
@@ -54,7 +54,7 @@ class ExampleService(dbus.service.Object):
         reply = self.conn.send_message_with_reply_and_block(msg, 2000)  # 2000 is a timeout in milliseconds
 
         return gear
-    '''
+
 
 if __name__ == '__main__':
     # piracer = PiRacerStandard()
@@ -75,8 +75,9 @@ if __name__ == '__main__':
         # battery = get_battery_status(battery_voltage)
         
         battery = 10.0
+        gear_status = "P"
 
         # Convert input to float
         time.sleep(1)
         object.send_battery_info(battery)
-        # object.send_gear_info(gear_status)
+        object.send_gear_info(gear_status)
