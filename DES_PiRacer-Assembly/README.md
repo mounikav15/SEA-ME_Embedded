@@ -1,7 +1,8 @@
 # **DES Project - PiRacer Assembly**
 
 ## Result
-![Alt text](<Images/result_image.png>){: width="50%" height="50%"}
+
+<img src="Images/result_image.png" alt="Alt text" width="50%" height="50%">
 
 ## Project Description
 
