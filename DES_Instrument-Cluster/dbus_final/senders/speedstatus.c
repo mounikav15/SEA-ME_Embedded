@@ -164,7 +164,7 @@ void *readCANThread(void *arg) {
         uint8_t speed_value, rpm_value;
         read_port(&speed_value, &rpm_value);
 
-        printf("CAN Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
+        // printf("CAN Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
 
         pthread_mutex_lock(&bufferMutex);
         if (bufferIndex < BUFFER_SIZE) {
@@ -190,6 +190,8 @@ void *dbusSendThread(void *arg) {
             uint8_t rpm_value = buffer[bufferIndex - 1].rpm;
             bufferIndex--;
             pthread_mutex_unlock(&bufferMutex);
+
+            printf("CAN Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
 
             // Send speed_value
             speed_msg = dbus_message_new_method_call(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, "setSpeed");
@@ -262,6 +264,8 @@ void *dbusSendThread(void *arg) {
             }
             dbus_message_unref(rpm_msg);
             dbus_pending_call_unref(rpm_pending);
+
+            usleep(500000);
 
         } else {
             pthread_mutex_unlock(&bufferMutex);
