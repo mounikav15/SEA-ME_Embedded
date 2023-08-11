@@ -75,9 +75,18 @@ if __name__ == '__main__':
         
         # battery = 10.0
         gear_status = "P"
+
+        if piracer.throttle_pwm_controller.channels[piracer.PWM_THROTTLE_CHANNEL_LEFT_MOTOR_IN1].duty_cycle > 0:
+            gear_status = "D"
+        elif piracer.throttle_pwm_controller.channels[piracer.PWM_THROTTLE_CHANNEL_LEFT_MOTOR_IN2].duty_cycle > 0:
+            gear_status = "R"
+        else:
+            gear_status = "P"
+        
         gear_byte = dbus.Byte(ord(gear_status))
 
         # Convert input to float
         time.sleep(1)
         object.send_battery_info(battery)
         object.send_gear_info(gear_byte)
+
