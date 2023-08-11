@@ -19,8 +19,19 @@
 #include <ctype.h>
 #include <dbus/dbus.h>
 
+// Multi-thread header
+#include <pthread.h>
+
 // CAN setting
 int soc;
+typedef struct {
+    uint8_t speed;
+    uint8_t rpm;
+} CANData;
+
+CANData buffer[BUFFER_SIZE];
+int bufferIndex = 0;
+pthread_mutex_t bufferMutex = PTHREAD_MUTEX_INITIALIZER;
 
 int open_port(const char *port);
 void read_port(uint8_t *speed, uint8_t *rpm);
@@ -33,11 +44,38 @@ const char *const CLIENT_BUS_NAME = "org.team4.Des02.Client";
 const char *const SERVER_OBJECT_PATH_NAME = "/CarInformation";
 const char *const CLIENT_OBJECT_PATH_NAME = "/CarInformationClient";
 
-DBusError dbus_error;  
-void print_dbus_error (char *str);
+DBusError dbus_error;
+void print_dbus_error(char *str);
+
+// Multi-thread setting
+void *readCANThread(void *arg);
+void * dbusSendThread(void *arg);
 
 int main (int argc, char **argv)
 {
+
+    open_port("can0");
+
+    DBusConnection *conn;
+    dbus_error_init(&dbus_error);
+    conn = dbus_bus_get(DBUS_BUS_SESSION, &dbus_error);
+
+    if (dbus_error_is_set(&dbus_error))
+        print_dbus_error("Connecting D-Bus Error\n");
+
+    if (!conn) exit(1);
+
+    pthread_t canThread, dbusThread;
+    pthread_create(&canThread, NULL, readCANThread, NULL);
+    pthread_create(&dbusThread, NULL, dbusSendThread, (void *)conn);
+
+    pthread_join(canThread, NULL);
+    pthread_join(dbusThread, NULL);
+
+    close_port();
+    return 0;
+
+    /*
     open_port("can0");
 
     DBusConnection *conn;  
@@ -135,9 +173,11 @@ int main (int argc, char **argv)
         
 
         dbus_message_unref(reply_speed);  
+        */
 
         /****************************************************************************************/
 
+        /*
         DBusMessage *request_rpm;
         if ((request_rpm = dbus_message_new_method_call(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, 
                         INTERFACE_NAME, "setRpm")) == NULL) 
@@ -202,12 +242,13 @@ int main (int argc, char **argv)
              exit (1);
         }
 
-        usleep(500000);
+        // usleep(500000);
     }
 
     close_port();
 
     return 0;
+    */
 }
 
 
@@ -294,6 +335,38 @@ void print_dbus_error (char *str)
 }
 
 
+void *readCANThread(void *arg) {
+    while (1) {
+        uint8_t speed_value, rpm_value;
+        read_port(&speed_value, &rpm_value);
 
+        pthread_mutex_lock(&bufferMutex);
+        if (bufferIndex < BUFFER_SIZE) {
+            buffer[bufferIndex].speed = speed_value;
+            buffer[bufferIndex].rpm = rpm_value;
+            bufferIndex++;
+        }
+        pthread_mutex_unlock(&bufferMutex);
+    }
+    return NULL;
+}
 
+void *dbusSendThread(void *arg) {
+    DBusConnection *conn = (DBusConnection *)arg;
+    while (1) {
+        pthread_mutex_lock(&bufferMutex);
+        if (bufferIndex > 0) {
+            uint8_t speed_value = buffer[bufferIndex - 1].speed;
+            uint8_t rpm_value = buffer[bufferIndex - 1].rpm;
+            bufferIndex--;
+            pthread_mutex_unlock(&bufferMutex);
 
+            // TODO: Send the speed_value and rpm_value to D-Bus using your existing method
+
+        } else {
+            pthread_mutex_unlock(&bufferMutex);
+            usleep(1000);
+        }
+    }
+    return NULL;
+}

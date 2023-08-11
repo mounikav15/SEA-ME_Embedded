@@ -49,6 +49,7 @@ void read_port()
     
     while(read_can_port)
     {
+        usleep(100000);
         struct timeval timeout = {1, 0};
         fd_set readSet;
         FD_ZERO(&readSet);
