@@ -2,7 +2,7 @@
 
 ## Result
 
-<img src="Images/result_image.png" alt="Alt text" width="50%" height="50%" style="transform: rotate(-90deg);>
+<img src="Images/result_image.png" alt="Alt text" width="50%" height="50%" style="transform: rotate(-90deg)">
 
 ## Project Description
 
