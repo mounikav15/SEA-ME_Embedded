@@ -11,7 +11,7 @@
     </method>
     <method name="setGear">
       <arg type="s" direction="out"/>
-      <arg name="gearByte" type="ay" direction="in"/>
+      <arg name="gearByte" type="y" direction="in"/>
     </method>
     <method name="setRpm">
       <arg type="s" direction="out"/>
@@ -22,9 +22,6 @@
     </method>
     <method name="getBattery">
       <arg type="d" direction="out"/>
-    </method>
-    <method name="getGear">
-      <arg type="ay" direction="out"/>
     </method>
     <method name="getRpm">
       <arg type="y" direction="out"/>

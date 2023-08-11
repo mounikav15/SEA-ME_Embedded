@@ -13,11 +13,11 @@ public:
 public Q_SLOTS:
     QString setSpeed(quint8 speed);
     QString setBattery(qreal battery);
-    QString setGear(const QByteArray &gearByte);
+    QString setGear(quint8 gearByte);
     QString setRpm(quint8 rpm);
     quint8 getSpeed();
     qreal getBattery();
-    QByteArray getGear();
+    char getGear();
     quint8 getRpm();
 
 private:

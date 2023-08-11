@@ -22,13 +22,10 @@ QString CarInformation::setBattery(qreal battery)
     return "Get Battery";
 }
 
-QString CarInformation::setGear(const QByteArray &gearData)
+QString CarInformation::setGear(quint8 gearByte)
 {
-    if(!gearData.isEmpty())
-    {
-        gear = gearData.at(0);
-        qDebug() << "Receive Gear Data : " << gear;
-    }
+    gear = static_cast<char>(gearByte);
+    qDebug() << "Receive Gear Data : " << gear;
     return "Get Gear";
 }
 
@@ -49,12 +46,9 @@ qreal CarInformation::getBattery()
     return battery;
 }
 
-QByteArray CarInformation::getGear()
+char CarInformation::getGear()
 {
-    QByteArray result;
-    result.append(gear);
-
-    return result;
+    return gear;
 }
 
 quint8 CarInformation::getRpm()

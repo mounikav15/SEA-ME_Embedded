@@ -76,8 +76,9 @@ if __name__ == '__main__':
         
         battery = 10.0
         gear_status = "P"
+        gear_byte = dbus.Byte(ord(gear_status))
 
         # Convert input to float
         time.sleep(1)
         object.send_battery_info(battery)
-        object.send_gear_info(gear_status)
+        object.send_gear_info(gear_byte)
