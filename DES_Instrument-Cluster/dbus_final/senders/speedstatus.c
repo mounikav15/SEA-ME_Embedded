@@ -263,7 +263,7 @@ void read_port(uint8_t *speed, uint8_t *rpm)
         if (FD_ISSET(soc, &readSet))
         {
             recvbytes = read(soc, &frame, sizeof(struct can_frame));
-            
+            printf("Received bytes: %d\n", recvbytes);
             if (recvbytes)
             {
                 int disk_rpm = (frame.data[0] << 8) + frame.data[1];
