@@ -4,12 +4,11 @@ import dbus.mainloop.glib
 from gi.repository import GLib
 import time
 
-# from piracer.vehicles import PiRacerStandard
+from piracer.vehicles import PiRacerStandard
 
 def get_battery_status(battery_voltage):
-    battery_status = (battery_voltage - 2.8 * 3.0) / (12.3 - 2.8 * 3.0) * 100.0
-
     # Equation for calculate leftover battery
+    battery_status = (battery_voltage - 2.8 * 3.0) / (12.3 - 2.8 * 3.0) * 100.0
 
     return battery_status
 
@@ -57,7 +56,7 @@ class ExampleService(dbus.service.Object):
 
 
 if __name__ == '__main__':
-    # piracer = PiRacerStandard()
+    piracer = PiRacerStandard()
 
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
@@ -67,14 +66,14 @@ if __name__ == '__main__':
     print("Service Running...")
 
     while True:
-        # battery_voltage = piracer.get_battery_voltage()
+        battery_voltage = piracer.get_battery_voltage()
         # battery_current = piracer.get_battery_current()
         # gear_status = piracer.get_movement_status()
         # power_consumption = piracer.get_power_consumption()
 
-        # battery = get_battery_status(battery_voltage)
+        battery = get_battery_status(battery_voltage)
         
-        battery = 10.0
+        # battery = 10.0
         gear_status = "P"
         gear_byte = dbus.Byte(ord(gear_status))
 
