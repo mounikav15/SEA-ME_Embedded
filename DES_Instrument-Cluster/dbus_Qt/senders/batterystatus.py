@@ -4,7 +4,7 @@ import dbus.mainloop.glib
 from gi.repository import GLib
 import time
 
-from piracer.vehicles import PiRacerStandard
+# from piracer.vehicles import PiRacerStandard
 
 def get_battery_status(battery_voltage):
     battery_status = (battery_voltage - 2.8 * 3.0) / (12.3 - 2.8 * 3.0) * 100.0
@@ -38,6 +38,7 @@ class ExampleService(dbus.service.Object):
 
         return battery
     
+    '''
     # Corresponds to INTERFACE_NAME in C code
     @dbus.service.method('org.team4.Des02.CarInformation')
     def send_gear_info(self, gear: dbus.Char) -> dbus.Char:
@@ -53,9 +54,10 @@ class ExampleService(dbus.service.Object):
         reply = self.conn.send_message_with_reply_and_block(msg, 2000)  # 2000 is a timeout in milliseconds
 
         return gear
+    '''
 
 if __name__ == '__main__':
-    piracer = PiRacerStandard()
+    # piracer = PiRacerStandard()
 
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
@@ -65,14 +67,16 @@ if __name__ == '__main__':
     print("Service Running...")
 
     while True:
-        battery_voltage = piracer.get_battery_voltage()
-        battery_current = piracer.get_battery_current()
-        gear_status = piracer.get_movement_status()
+        # battery_voltage = piracer.get_battery_voltage()
+        # battery_current = piracer.get_battery_current()
+        # gear_status = piracer.get_movement_status()
         # power_consumption = piracer.get_power_consumption()
 
-        battery = get_battery_status(battery_voltage)
+        # battery = get_battery_status(battery_voltage)
         
+        battery = 10.0
+
         # Convert input to float
         time.sleep(1)
         object.send_battery_info(battery)
-        object.send_gear_info(gear_status)
+        # object.send_gear_info(gear_status)

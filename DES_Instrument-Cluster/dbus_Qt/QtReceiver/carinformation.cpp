@@ -5,10 +5,10 @@ CarInformation::CarInformation(QObject *parent) : QObject(parent)
 {
     speed = 0;
     battery = 0.0;
-    gear = 'p';
+    gear = 'P';
 }
 
-QString CarInformation::setSpeed(qint16 speed)
+QString CarInformation::setSpeed(quint8 speed)
 {
     this->speed = speed;
     qDebug() << "Receive Speed Data : " << speed;
@@ -22,21 +22,24 @@ QString CarInformation::setBattery(qreal battery)
     return "Get Battery";
 }
 
-QString CarInformation::setGear(qreal gear)
+QString CarInformation::setGear(const QByteArray &gearData)
 {
-    this->gear = gear;
-    qDebug() << "Receive Gear Data : " << gear;
+    if(!gearData.isEmpty())
+    {
+        gear = gearData.at(0);
+        qDebug() << "Receive Gear Data : " << gear;
+    }
     return "Get Gear";
 }
 
-QString CarInformation::setRpm(qint16 rpm)
+QString CarInformation::setRpm(quint8 rpm)
 {
     this->rpm = rpm;
     qDebug() << "Receive Rpm Data : " << rpm;
     return "Get Rpm";
 }
 
-qreal CarInformation::getSpeed()
+quint8 CarInformation::getSpeed()
 {
     return speed;
 }
@@ -46,12 +49,15 @@ qreal CarInformation::getBattery()
     return battery;
 }
 
-qreal CarInformation::getGear()
+QByteArray CarInformation::getGear()
 {
-    return gear;
+    QByteArray result;
+    result.append(gear);
+
+    return result;
 }
 
-qreal CarInformation::getRpm()
+quint8 CarInformation::getRpm()
 {
     return rpm;
 }

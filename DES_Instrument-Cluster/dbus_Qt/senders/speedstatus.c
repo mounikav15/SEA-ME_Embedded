@@ -34,8 +34,8 @@ int main (int argc, char **argv)
 
     while (1) 
     {
-        int16_t speed_value = 10.0;
-        int16_t rpm_value = 10.0;
+        uint8_t speed_value = 10;
+        uint8_t rpm_value = 10;
 
         while (1) 
         {
@@ -66,7 +66,7 @@ int main (int argc, char **argv)
         DBusMessageIter iter_speed;
         dbus_message_iter_init_append(request_speed, &iter_speed);
 
-        if (!dbus_message_iter_append_basic(&iter_speed, DBUS_TYPE_INT16, &speed_value)) 
+        if (!dbus_message_iter_append_basic(&iter_speed, DBUS_TYPE_BYTE, &speed_value)) 
         {
             fprintf(stderr, "Error in dbus_message_iter_append_basic for speed_value\n");
             exit(1);
@@ -126,7 +126,7 @@ int main (int argc, char **argv)
         DBusMessageIter iter_rpm;
         dbus_message_iter_init_append(request_rpm, &iter_rpm);
 
-        if (!dbus_message_iter_append_basic(&iter_rpm, DBUS_TYPE_INT16, &rpm_value)) 
+        if (!dbus_message_iter_append_basic(&iter_rpm, DBUS_TYPE_BYTE, &rpm_value)) 
         {
             fprintf(stderr, "Error in dbus_message_iter_append_basic for rpm_value\n");
             exit(1);
