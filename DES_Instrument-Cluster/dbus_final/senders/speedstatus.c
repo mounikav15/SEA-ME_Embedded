@@ -22,6 +22,8 @@
 // Multi-thread header
 #include <pthread.h>
 
+#define BUFFER_SIZE 10
+
 // CAN setting
 int soc;
 typedef struct {
@@ -353,6 +355,10 @@ void *readCANThread(void *arg) {
 
 void *dbusSendThread(void *arg) {
     DBusConnection *conn = (DBusConnection *)arg;
+    DBusMessage *msg;
+    DBusMessageIter args;
+    DBusPendingCall *pending;
+
     while (1) {
         pthread_mutex_lock(&bufferMutex);
         if (bufferIndex > 0) {
@@ -361,7 +367,30 @@ void *dbusSendThread(void *arg) {
             bufferIndex--;
             pthread_mutex_unlock(&bufferMutex);
 
-            // TODO: Send the speed_value and rpm_value to D-Bus using your existing method
+            // Create a new method call and check for errors
+            msg = dbus_message_new_method_call(CLIENT_BUS_NAME, CLIENT_OBJECT_PATH_NAME, INTERFACE_NAME, "UpdateCarInfo");
+            if (NULL == msg) { 
+                fprintf(stderr, "Message Null\n");
+                exit(1);
+            }
+
+            // Append arguments onto signal
+            dbus_message_iter_init_append(msg, &args);
+            if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_BYTE, &speed_value) ||
+                !dbus_message_iter_append_basic(&args, DBUS_TYPE_BYTE, &rpm_value)) {
+                fprintf(stderr, "Out Of Memory!\n");
+                exit(1);
+            }
+
+            // Send the message and flush the connection
+            if (!dbus_connection_send(conn, msg, NULL)) { 
+                fprintf(stderr, "Out Of Memory!\n"); 
+                exit(1);
+            }
+            dbus_connection_flush(conn);
+
+            // Free the message
+            dbus_message_unref(msg);
 
         } else {
             pthread_mutex_unlock(&bufferMutex);
@@ -370,3 +399,4 @@ void *dbusSendThread(void *arg) {
     }
     return NULL;
 }
+
