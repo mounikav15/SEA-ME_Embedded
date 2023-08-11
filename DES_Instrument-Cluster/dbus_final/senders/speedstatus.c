@@ -267,10 +267,13 @@ void read_port(uint8_t *speed, uint8_t *rpm)
             if (recvbytes)
             {
                 int disk_rpm = (frame.data[0] << 8) + frame.data[1];
-                *rpm = (uint8_t)((float)disk_rpm / 2.6);
-                *speed = (uint8_t)(*rpm * 0.0034);
+                // *rpm = (uint8_t)((float)disk_rpm / 2.6);
+                // *speed = (uint8_t)(*rpm * 0.0034);
 
-                printf("Car RPM: %d\n", rpm);
+                *rpm = (uint8_t)(disk_rpm);
+                *speed = (uint8_t)(disk_rpm);
+
+                printf("Car RPM: %d\n", *rpm);
             }
         }
     }
