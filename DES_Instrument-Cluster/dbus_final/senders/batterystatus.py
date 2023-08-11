@@ -74,14 +74,14 @@ if __name__ == '__main__':
         battery = get_battery_status(battery_voltage)
         
         # battery = 10.0
-        gear_status = "P"
+        gear_status = "N"
 
         if piracer.throttle_pwm_controller.channels[piracer.PWM_THROTTLE_CHANNEL_LEFT_MOTOR_IN1].duty_cycle > 0:
             gear_status = "D"
         elif piracer.throttle_pwm_controller.channels[piracer.PWM_THROTTLE_CHANNEL_LEFT_MOTOR_IN2].duty_cycle > 0:
             gear_status = "R"
         else:
-            gear_status = "P"
+            gear_status = "N"
         
         gear_byte = dbus.Byte(ord(gear_status))
 
