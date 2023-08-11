@@ -254,7 +254,7 @@ void read_port(uint8_t *speed, uint8_t *rpm)
     frame.can_dlc = 2;
     int recvbytes = 0;
 
-    strcut timeval timeout = {1, 0};
+    struct timeval timeout = {1, 0};
     fd_set readSet;
     FD_ZERO(&readSet);
     FD_SET(soc, &readSet);
