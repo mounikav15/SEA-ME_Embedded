@@ -8,6 +8,15 @@ Tested on the following distributions:
 
 * Rasbian Lite(Server) 64-Bit : latest version but update raspi-firmware version 5.15.84
 
+### Download Raspbian
+##### [Rpi-Imager](https://www.raspberrypi.com/software/)
+
+You can download Raspberry Pi Imager in link. You can choose raspbian version in imager. 
+
+We choose Rasbian Lite 64-Bit. 
+
+Among the parts to be careful of, the USB erase function in Imager cannot initialize the file system, so you need to download the OS from Imager after initializing the USB with a program that initializes the file system.
+
 ### Basic Wi-Fi setting
 
 If you know the Wi-Fi ssid and access password, you can add the following to the "wpa_supplicant.conf" file. 
@@ -68,25 +77,6 @@ sudo rpi-update (firmware_version)
 sudo reboot
 ```
 
-### Add additional sources
-
-If you run **Ubuntu**, add the following sources first:
-
-    sudo -s
-    echo "deb http://archive.raspberrypi.org/debian/ buster main" >> /etc/apt/sources.list
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 7FA3303E
-    apt update
-    exit
-
-If you're facing messages like the following when trying to install packages
-via apt:
-
-    pi@ubuntu:/home/pi# sudo apt install PACKAGES...
-    Waiting for cache lock: Could not get lock /var/lib/dpkg/lock-frontend. It is held by process 1807 (unattended-upgr)
-
-Disable the unattended upgrade feature by running the following command to disable:
-
-    sudo dpkg-reconfigure unattended-upgrades
 
 ### Install dependencies:
 
@@ -99,18 +89,12 @@ Disable the unattended upgrade feature by running the following command to disab
         python3-dev \
         python3-setuptools \
         libopencv-dev \
-        python3-pip
+        python3-pip \
     sudo apt upgrade
     sudo reboot
 
 ### Setup periphery 
 
-#### Mount boot partition (Ubuntu only)
-
-On Ubuntu it is necessary to explicitly mount the boot partition before 
-enabling the i2c controller and camera:
-
-    mount /dev/mmcblk0p1 /boot/
 
 #### Enable i2c and camera
 
@@ -126,12 +110,11 @@ Afterwards, reboot:
 ### Install piracer-py package
 
     cd ~
-    git clone https://github.com/dongdongO/SEA-ME_Main.git
-    cd DES_PiRacer-Assembly/
+    git clone https://github.com/dongdongO/SEA-ME_Embedded.git
+    cd DES_PiRacer-Assembly/examples
 
     pip install piracer-py
 
-    cd examples
 
 ## Examples
 
