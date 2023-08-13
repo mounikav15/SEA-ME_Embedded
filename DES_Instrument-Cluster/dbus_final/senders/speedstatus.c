@@ -357,7 +357,7 @@ void *dbusSendThread(void *arg) {
         }
         dbus_message_unref(rpm_req);
 
-        usleep(500000);
+        // usleep(500000);
     }
     return NULL;
 }
