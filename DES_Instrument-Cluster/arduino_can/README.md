@@ -1,23 +1,5 @@
-# **DES Project - CAN with Arduino** 
-</br>
+# **DES Project - CAN with Arduino**   
 
-
-# Index
-#### [Results](#results-1)
-#### [Introduction](#introduction-1)
-#### [Background Information](#background-information-1)
-#### [Project Goals & Objectives](#project-goals-and-objectives)
-#### [Hardware Setting](#hardware-setting-1)
-#### [Software Setting](#software-setting-1)
-#### [References](#references-1)
-</br>
-
-# Results
-
-<img src="https://github.com/dongdongO/SEA-ME_Main/assets/97011426/d2c79360-2db4-4797-aa95-8f3230b15e07" width="60%" height="60%"/>
-
-
-</br>
 
 # Introduction
 
@@ -25,8 +7,8 @@ This document outlines the experiments conducted by our team, utilizing the Cont
 
 Our team has set a goal to leverage these capabilities of the CAN communication in applying it for communication between Raspberry Pi and Arduino. However, before implementing such communication protocol, we first tested whether CAN communication between Arduinos is successfully achieved.
 
-This document details the process and results of such testing, so that you will gain a basic understanding of how to implement CAN communication between Arduinos and learn how to execute actual communication scenarios.
-</br>
+This document details the process and results of such testing, so that you will gain a basic understanding of how to implement CAN communication between Arduinos and learn how to execute actual communication scenarios.  
+
 
 
 # Background Information
@@ -35,8 +17,8 @@ Controller Area Network (CAN) is a robust and efficient communication protocol, 
 
 CAN's efficiency stems from its design, which allows multiple devices on the same network to communicate without a host computer, improving data exchange. It ensures reliability through prioritized messages, error detection, and automatic re-transmission of faulty messages.
 
-Moreover, CAN's scalability is due to its layered architecture, which allows for easy expansion or modification of the network. This document will provide a condensed understanding of the CAN protocol, focusing on its application in Arduino-based systems.
-</br>
+Moreover, CAN's scalability is due to its layered architecture, which allows for easy expansion or modification of the network. This document will provide a condensed understanding of the CAN protocol, focusing on its application in Arduino-based systems.  
+
 
 
 # Project Goals and Objectives
@@ -52,12 +34,10 @@ Here are the specific objectives of the project:
 5. To document all the processes, experiments, results, and conclusions comprehensively, providing a robust guide for future endeavors involving the CAN protocol.
 
 
-By accomplishing these objectives, the project will not only verify the efficacy of CAN communication between Arduino boards but also provide a practical guide on how to implement efficient communication between Arduino boards using the CAN protocol.
-</br>
+By accomplishing these objectives, the project will not only verify the efficacy of CAN communication between Arduino boards but also provide a practical guide on how to implement efficient communication between Arduino boards using the CAN protocol.  
 
-# Hardware Setting
 
-<img src="https://github.com/dongdongO/SEA-ME_Main/assets/97011426/c1b66503-c0ae-4078-9a88-d3f69bd9cfc6" width="50%" height="50%"/>
+# Hardware Setting  
 
 ## Requirements
 
@@ -66,15 +46,15 @@ By accomplishing these objectives, the project will not only verify the efficacy
 * 1 MCP2515 module (you can also prepare 2 if you don't use the Arduino CAN shield)
 * Several jumper wires
 * Speed sensor
-* 2 laptops
-
+* 2 laptops  
+  
 ## Connect
 
-<img src="https://github.com/dongdongO/SEA-ME_Main/assets/97011426/8383d5d7-b747-43cb-b574-92792c97d5cb" width="40%" height="40%"/>
+<img src="arduino_can_GPIO" alt="Alt text" width="50%" height="50%">
 
 
-Please refer to the above image and the Arduino's GPIO map for connections.
-</br>
+Please refer to the above image and the Arduino's GPIO map for connections.  
+
 
 # Software Setting
 
@@ -87,9 +67,7 @@ If you want to test CAN on the configured Arduino, please follow these steps:
 
 For more detailed instructions, it's strongly recommended to read the README file of the [repository](https://github.com/autowp/arduino-mcp2515).
 
-Additionally, if you want to communicate data from the speed sensor, please use the 'speedwrite' and 'speedread' codes.
-
-</br>
+Additionally, if you want to communicate data from the speed sensor, please use the 'speedwrite' and 'speedread' codes.  
 
 
 
