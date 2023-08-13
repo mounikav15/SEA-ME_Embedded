@@ -50,7 +50,7 @@ By accomplishing these objectives, the project will not only verify the efficacy
   
 ## Connect
 
-<img src="Images/arduino_can_GPIO.png" alt="Alt text" width="50%" height="50%">
+<img src="DES_Instrument-Cluster/Images/arduino_can_GPIO.png" alt="Alt text" width="50%" height="50%">
 
 
 Please refer to the above image and the Arduino's GPIO map for connections.  
