@@ -80,70 +80,54 @@ int main (int argc, char **argv)
     return 0;
 }
 
-// CAN function definitions
 
-/**
- * @brief Opens the CAN port.
- * 
- * @param port The name of the port to be opened.
- * @return Returns 0 on success, -1 on failure.
- */
+
+// CAN function
 int open_port(const char *port)
 {
     struct ifreq ifr;
     struct sockaddr_can addr;
 
-    // Open the socket
+    /* open socket */
     soc = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (soc < 0) 
     {
-        printf("Error opening socket!");
+	    printf("error!");
         return (-1);
     }
 
     addr.can_family = AF_CAN;
     strcpy(ifr.ifr_name, port);
 
-    // Retrieve the interface index for the interface name
     if (ioctl(soc, SIOCGIFINDEX, &ifr) < 0) 
     {
-        printf("Error retrieving interface index!");
+	    printf("error!");
         return (-1);
     }
 
     addr.can_ifindex = ifr.ifr_ifindex;
-
-    // Set the socket to non-blocking mode
     fcntl(soc, F_SETFL, O_NONBLOCK);
 
-    // Bind the socket to the CAN interface
     if (bind(soc, (struct sockaddr *)&addr, sizeof(addr)) < 0) 
     {
-        printf("Error binding to the socket!");
+	    printf("binding error!");
         return (-1);
     }
 
     return 0;
 }
 
-/**
- * @brief Reads data from the CAN port.
- * 
- * @param speed Pointer to a variable where the speed data will be stored.
- * @param rpm Pointer to a variable where the RPM data will be stored.
- */
+
 void read_port(uint8_t *speed, uint8_t *rpm)
 {
     struct can_frame frame;
-    frame.can_dlc = 2;  // Expected Data Length Code
+    frame.can_dlc = 2;
     int recvbytes = 0;
 
     struct timeval timeout = {1, 0};
     fd_set readSet;
     FD_ZERO(&readSet);
     FD_SET(soc, &readSet);
-
-    // Wait for data to be ready to read
     if (select((soc + 1), &readSet, NULL, NULL, &timeout) >= 0)
     {
         if (FD_ISSET(soc, &readSet))
@@ -152,7 +136,6 @@ void read_port(uint8_t *speed, uint8_t *rpm)
     
             if (recvbytes)
             {
-                // Process the CAN frame data to retrieve RPM and Speed
                 int disk_rpm = (frame.data[0] << 8) + frame.data[1];
                 *rpm = (uint8_t)((float)disk_rpm / 2.6);
                 *speed = (uint8_t)(*rpm * 3.4);
@@ -161,17 +144,12 @@ void read_port(uint8_t *speed, uint8_t *rpm)
     }
 }
 
-/**
- * @brief Closes the CAN port.
- * 
- * @return Returns 0 on success.
- */
+
 int close_port()
 {
     close(soc);
     return 0;
 }
-
 
 // Dbus function
 
@@ -181,19 +159,18 @@ void print_dbus_error (char *str)
     dbus_error_free (&dbus_error);
 }
 
-// Thread function that reads and saves CAN data 
-// This thread operates independently of dbusSendThread
+// Thread function to read and save CAN data 
+// This thread run independently of dbusSendThread
 void *readCANThread(void *arg) {
     while (1) {
-        // Retrieve speed and rpm values from CAN
+        // Get speed and rpm value from CAN
         uint8_t speed_value, rpm_value;
         read_port(&speed_value, &rpm_value);
 
-        // Uncomment below to print the retrieved CAN data
         // printf("CAN Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
 
-        // Manage bufferIndex as a circular queue (ring buffer)
-        // Use mutex to ensure thread safety during access
+        // Manage bufferIndex as a circular queue
+        // Use mutex for thread safe
         pthread_mutex_lock(&bufferMutex);
         buffer[bufferIndex].speed = speed_value;
         buffer[bufferIndex].rpm = rpm_value;
@@ -203,11 +180,11 @@ void *readCANThread(void *arg) {
     return NULL;
 }
 
-// Thread function to send CAN data over DBus
-// This thread operates independently of readCANThread
+// Thread function to send CAN data to DBus
+// This thread run independently of readCANThread
 void *dbusSendThread(void *arg) {
-    // Basic DBus setup
-    // Using Thread for dbus connection instance
+    // Basic setting for DBus
+    // Using Thread as instance for dbus connection
     DBusConnection *conn = (DBusConnection *)arg;
     DBusMessage *speed_msg, *rpm_msg;
     DBusMessage *speed_req, *rpm_req;
@@ -215,84 +192,77 @@ void *dbusSendThread(void *arg) {
     DBusPendingCall *speed_pending, *rpm_pending;
 
     while (1) {
-        // Ensure thread safety using a mutex
+        // Use mutex for thread safe
         pthread_mutex_lock(&bufferMutex);
 
-        printf("Current buffer content:\n");
-        for (int i = 0; i < BUFFER_SIZE; i++) {
-            printf("Buffer[%d] - Speed: %d RPM: %d\n", i, buffer[i].speed, buffer[i].rpm);
-        }
-
-        // Get the most recent data index
+        // Gets the index which the most recent data
         int currentIndex = bufferIndex - 1;
 
-        // If bufferIndex is 0, set currentIndex to the last index of the buffer
+        // If bufferIndex is 0, currentIndex should be BUFFER_SIZE - 1
         if (bufferIndex < 1) 
         {
             currentIndex = BUFFER_SIZE - 1;
         }
 
-        // Store the most recent data from the buffer
+        // Save the newest data in buffer
         uint8_t speed_value = buffer[currentIndex].speed;
         uint8_t rpm_value = buffer[currentIndex].rpm;
 
-        // Unlock the mutex
+        // Release mutex
         pthread_mutex_unlock(&bufferMutex);
 
-        // Uncomment below to print the CAN data being sent
         // printf("CAN Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
 
-        // Send speed_value to the server using DBus
-        // Use "dbus_message_new_method_call" to create a DBus message
+        // Send speed_value : Check the method name(setSpeed) in Qt
+        // "dbus_message_new_method_call" 함수를 사용하여 DBus 메시지를 생성해서 speed_msg에 저장. -> 아직 dbus에 안들어감
+        // 이 메시지는 특정 버스 이름, 객체 경로, 인터페이스, 그리고 메소드 이름을 메세지에 적용
         speed_msg = dbus_message_new_method_call(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, "setSpeed");
         if (speed_msg == NULL) 
         { 
-            fprintf(stderr, "Failed to create Speed Message\n");
+            fprintf(stderr, "Speed Message Null\n");
             exit(1);
         }
-
-        // Initialize the message to append arguments
+        // 메시지에 매개변수를 첨부하기 위해 "dbus_message_iter_init_append" 함수를 호출
         dbus_message_iter_init_append(speed_msg, &speed_args);
 
-        // Attach the actual data (speed_value) as an argument to the message
+        // "dbus_message_iter_append_basic" 함수를 사용하여 매개변수에 실제 데이터(speed_value)를 연결.
         if (!dbus_message_iter_append_basic(&speed_args, DBUS_TYPE_BYTE, &speed_value)) 
         {
-            fprintf(stderr, "Out of memory when setting Speed!\n");
+            fprintf(stderr, "Out Of Memory for setSpeed!\n");
             exit(1);
         }
         
-        // Send the message and await a reply, binding the message with the connection
+        // "dbus_connection_send_with_reply" 함수의 호출 성공 여부 : 여기서 conn과 speed_msg가 묶임
         if (!dbus_connection_send_with_reply(conn, speed_msg, &speed_pending, -1)) 
         { 
-            fprintf(stderr, "Out of memory when sending Speed message!\n"); 
+            fprintf(stderr, "Out Of Memory for setSpeed!\n"); 
             exit(1);
         }
 
-        // Check if the call is successful
+        // 호출된 함수의 객체 성공 여부
         if (speed_pending == NULL) 
         { 
-            fprintf(stderr, "Speed Pending Call failed\n"); 
+            fprintf(stderr, "Speed Pending Call Null\n"); 
             exit(1);
         }
 
-        // Flush the connection to ensure all changes are immediately sent to D-Bus
-        dbus_connection_flush(conn);
-        // Release memory associated with the message
-        dbus_message_unref(speed_msg);
+        dbus_connection_flush(conn);    // 모든 변경사항을 즉시 D-Bus에 전송 -> conn은 연결에 관여
+        dbus_message_unref(speed_msg);  // 메시지를 unref하고, 더 이상 필요하지 않을 때 메모리를 해제 -> speed_msg는 정보에 관여
 
-        // Block until the pending return is ready, then process the reply
-        dbus_pending_call_block(speed_pending);
+        // 응답 메세지가 에러가 아닐 경우에만 받은 데이터를 작업하도록 설정: 즉 응답 메세지가 에러라면 해당 데이터 작업 못하게끔
+        dbus_pending_call_block(speed_pending); // pending_return가 준비될 때까지 블록
 
-        // Get the reply message
+        // dbus_pending_call_steal_reply 함수를 사용하여 응답 메시지 받기
         speed_req = dbus_pending_call_steal_reply(speed_pending);
         if (speed_req == NULL) 
         {
-            fprintf(stderr, "Failed to get Speed Reply\n");
+            fprintf(stderr, "Speed Reply Null\n");
             exit(1);
         }
-        dbus_pending_call_unref(speed_pending);
 
-        // Extract arguments from the reply and print them
+        dbus_pending_call_unref(speed_pending); // 응답 메세지가 NULL이 아니면 작업 승인 & 대기 중인 호출에 대한 참조를 제거
+
+        // dbus_message_get_args 함수를 사용하여 응답 메시지의 인수를 가져오기 : 응답 메세지 있다면 출력
         char *speed_reply_msg;
         if (dbus_message_get_args(speed_req, &dbus_error, DBUS_TYPE_STRING, &speed_reply_msg, DBUS_TYPE_INVALID)) 
         {
@@ -300,36 +270,37 @@ void *dbusSendThread(void *arg) {
         }
         else 
         {
-             fprintf (stderr, "Failed to get arguments in reply\n");
+             fprintf (stderr, "Did not get arguments in reply\n");
              exit (1);
         }
         dbus_message_unref(speed_req);
 
         /*******************************************************************************************************************/
 
-        // Send rpm_value to the server using DBus, following the same procedure as speed_value
+        // Send rpm_value
+        // Same as speed_value
         rpm_msg = dbus_message_new_method_call(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, "setRpm");
         if (NULL == rpm_msg) 
         { 
-            fprintf(stderr, "Failed to create RPM Message\n");
+            fprintf(stderr, "RPM Message Null\n");
             exit(1);
         }
 
         dbus_message_iter_init_append(rpm_msg, &rpm_args);
         if (!dbus_message_iter_append_basic(&rpm_args, DBUS_TYPE_BYTE, &rpm_value)) 
         {
-            fprintf(stderr, "Out of memory when setting RPM!\n");
+            fprintf(stderr, "Out Of Memory for setRpm!\n");
             exit(1);
         }
 
         if (!dbus_connection_send_with_reply(conn, rpm_msg, &rpm_pending, -1)) 
         { 
-            fprintf(stderr, "Out of memory when sending RPM message!\n"); 
+            fprintf(stderr, "Out Of Memory for setRpm!\n"); 
             exit(1);
         }
 
         if (NULL == rpm_pending) { 
-            fprintf(stderr, "RPM Pending Call failed\n"); 
+            fprintf(stderr, "RPM Pending Call Null\n"); 
             exit(1);
         }
 
@@ -340,7 +311,7 @@ void *dbusSendThread(void *arg) {
         rpm_req = dbus_pending_call_steal_reply(rpm_pending);
         if (NULL == rpm_req) 
         {
-            fprintf(stderr, "Failed to get RPM Reply\n");
+            fprintf(stderr, "RPM Reply Null\n");
             exit(1);
         }
         dbus_pending_call_unref(rpm_pending);
@@ -352,15 +323,14 @@ void *dbusSendThread(void *arg) {
         }        
         else 
         {
-            fprintf (stderr, "Failed to get arguments in reply\n");
+            fprintf (stderr, "Did not get arguments in reply\n");
             exit (1);
         }
         dbus_message_unref(rpm_req);
 
-        // usleep(500000);
+        usleep(500000);
     }
     return NULL;
 }
-
 
 
