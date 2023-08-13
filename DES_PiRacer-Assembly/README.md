@@ -2,12 +2,12 @@
 
 ## Result
 
-<img src="Images/result_image.png" alt="Alt text" width="50%" height="50%" style="transform: rotate(-90deg);"/>
+<img src="Images/result_image.png" alt="Alt text" width="50%" height="50%" style="transform: rotate(-90deg);"/>  
 
 ## Project Description
 
-The PiRacer is a compact, single-board computer-based racing car that uses the Raspberry Pi computer as its brain. In this project, we will assemble and test PiRacers.
-<br>
+The PiRacer is a compact, single-board computer-based racing car that uses the Raspberry Pi computer as its brain. In this project, we will assemble and test PiRacers.  
+<br>  
 
 
 ## Project Requirements
@@ -28,3 +28,6 @@ The PiRacer is a compact, single-board computer-based racing car that uses the R
 3. Try examples code.
 <br>
 
+## References
+
+* [Piracer_py](https://github.com/twyleg/piracer_py)
