@@ -286,7 +286,7 @@ void *dbusSendThread(void *arg)
             }
         }
         
-        printf("Updated Estimation: x = %lf\n", renewed_e[0]);
+        // printf("Updated Estimation: x = %lf\n", renewed_e[0]);
 
 
         // Create and initialize the speed message for dbus
