@@ -280,14 +280,14 @@ void *dbusSendThread(void *arg)
         // Print the CAN data retrieved
         printf("CAN Data - Speed: %d RPM: %d\n", speed_value_raw, rpm_value_raw);
 
-        rpm_measuredstate = (double) rpm_value_raw;
+        // rpm_measuredstate = (double) rpm_value_raw;
+        rpm_measuredstate = 0.0
 
         kalmanFilter_(rpm_measuredstate, rpm_estimation, rpm_letterP, rpm_dt, rpm_renewed_e, rpm_renewed_P);
         
         // Update the estimation and covariance for the next iteration
         for (int i = 0; i < SIZE; i++) {
             rpm_estimation[i] = rpm_renewed_e[i];
-            printf("Updated Estfdasfadaimation: x = %lf\n", rpm_renewed_e[i]);
             for (int j = 0; j < SIZE; j++) {
                 rpm_letterP[i][j] = rpm_renewed_P[i][j];
             }
@@ -312,8 +312,6 @@ void *dbusSendThread(void *arg)
         printf("Updated Estimation: x = %lf\n", speed_renewed_e[0]);
 
         uint8_t speed_value = (uint8_t) round(speed_renewed_e[0]);
-
-        printf("Calculate Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
 
 
         // Create and initialize the speed message for dbus
