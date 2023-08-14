@@ -292,7 +292,7 @@ void *dbusSendThread(void *arg)
             }
         }
         
-        printf("Updated Estimation: x = %lf\n", rpm_renewed_e[0]);
+        // printf("Updated Estimation: x = %lf\n", rpm_renewed_e[0]);
 
         uint8_t rpm_value = (uint8_t) round(rpm_renewed_e[0]);
 
