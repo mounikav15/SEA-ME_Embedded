@@ -264,17 +264,17 @@ void *dbusSendThread(void *arg)
         }
 
         // Retrieve the most recent data from the buffer
-        uint8_t speed_value = buffer[currentIndex].speed;
+        uint8_t speed_value_raw = buffer[currentIndex].speed;
         uint8_t rpm_value = buffer[currentIndex].rpm;
 
         // Unlock the mutex after reading data
         pthread_mutex_unlock(&bufferMutex);
 
         // Print the CAN data retrieved
-        printf("CAN Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
+        printf("CAN Data - Speed: %d RPM: %d\n", speed_value_raw, rpm_value);
 
 
-        measuredstate = (double) speed_value;
+        measuredstate = (double) speed_value_raw;
 
         kalmanFilter_(measuredstate, estimation, letterP, dt, renewed_e, renewed_P);
         
@@ -287,6 +287,10 @@ void *dbusSendThread(void *arg)
         }
         
         printf("Updated Estimation: x = %lf\n", renewed_e[0]);
+
+        uint8_t speed_value = (uint8_t) round(renewed_e[0]);
+
+
 
 
         // Create and initialize the speed message for dbus
