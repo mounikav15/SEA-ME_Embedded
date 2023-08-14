@@ -269,7 +269,7 @@ void *dbusSendThread(void *arg)
         .dt = 1
     };
 
-    double speed_measurement, rpm_measurement
+    double speed_measurement, rpm_measurement;
 
     while (1)  // Infinite loop to continuously send data
     {
