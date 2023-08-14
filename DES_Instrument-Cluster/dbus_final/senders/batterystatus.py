@@ -15,16 +15,16 @@ def get_battery_status(battery_voltage):
 
 class ExampleService(dbus.service.Object):
     def __init__(self):
-        # Corresponds to SERVER_BUS_NAME in C code
+        # Corresponds to SERVER_BUS_NAME in Qt
         bus_name = dbus.service.BusName('org.team4.Des02', bus=dbus.SessionBus())
-        # Corresponds to SERVER_OBJECT_PATH_NAME in C code
+        # Corresponds to SERVER_OBJECT_PATH_NAME in Qt
         dbus.service.Object.__init__(self, bus_name, '/CarInformation')
         self.conn = dbus.SessionBus()
 
-    # Corresponds to INTERFACE_NAME in C code
+    # Corresponds to INTERFACE_NAME in Qt
     @dbus.service.method('org.team4.Des02.CarInformation')
     def send_battery_info(self, battery: dbus.Double) -> dbus.Double:
-        # Create a new method call message
+        # Create a new method call message : Qt has method(function) name "setBattery"
         # dbus.lowlevel.MethodCallMessage(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, METHOD_NAME)
         msg = dbus.lowlevel.MethodCallMessage("org.team4.Des02", "/CarInformation", "org.team4.Des02.CarInformation", "setBattery")
         
@@ -38,10 +38,10 @@ class ExampleService(dbus.service.Object):
         return battery
     
 
-    # Corresponds to INTERFACE_NAME in C code
+    # Corresponds to INTERFACE_NAME in Qt
     @dbus.service.method('org.team4.Des02.CarInformation')
     def send_gear_info(self, gear: dbus.Byte) -> dbus.Byte:
-        # Create a new method call message
+        # Create a new method call message : Qt has method(function) name "setGear"
         # dbus.lowlevel.MethodCallMessage(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, METHOD_NAME)
         msg = dbus.lowlevel.MethodCallMessage("org.team4.Des02", "/CarInformation", "org.team4.Des02.CarInformation", "setGear")
         
@@ -56,37 +56,37 @@ class ExampleService(dbus.service.Object):
 
 
 if __name__ == '__main__':
-    piracer = PiRacerStandard()
+    piracer = PiRacerStandard()  # Create an instance of the PiRacerStandard class
 
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)  # Set the DBus main loop
 
-    object = ExampleService()
+    object = ExampleService()  # Create an instance of the ExampleService class
 
-    loop = GLib.MainLoop()
+    loop = GLib.MainLoop()  # Start the GLib main loop
     print("Service Running...")
 
-    while True:
-        battery_voltage = piracer.get_battery_voltage()
+    while True:  # Infinite loop
+        battery_voltage = piracer.get_battery_voltage()  # Get the battery voltage from the PiRacer
+
+        # Calculate the battery status using the provided formula
+        battery = get_battery_status(battery_voltage)
         # battery_current = piracer.get_battery_current()
         # gear_status = piracer.get_movement_status()
         # power_consumption = piracer.get_power_consumption()
 
-        battery = get_battery_status(battery_voltage)
-        
-        # battery = 10.0
-        gear_status = "N"
-
+        # Check the throttle status to determine the gear status
         if piracer.throttle_pwm_controller.channels[piracer.PWM_THROTTLE_CHANNEL_LEFT_MOTOR_IN1].duty_cycle > 0:
-            gear_status = "D"
+            gear_status = "D"  # Drive
         elif piracer.throttle_pwm_controller.channels[piracer.PWM_THROTTLE_CHANNEL_LEFT_MOTOR_IN2].duty_cycle > 0:
-            gear_status = "R"
+            gear_status = "R"  # Reverse
         else:
-            gear_status = "N"
+            gear_status = "N"  # Neutral
         
-        gear_byte = dbus.Byte(ord(gear_status))
+        gear_byte = dbus.Byte(ord(gear_status))  # Convert the gear status to a byte format
 
-        # Convert input to float
-        time.sleep(1)
+        time.sleep(0.5)  # Delay for 0.5 seconds
+
+        # Send the battery and gear info to the DBus
         object.send_battery_info(battery)
         object.send_gear_info(gear_byte)
 
