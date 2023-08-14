@@ -246,7 +246,7 @@ void *dbusSendThread(void *arg)
     double speed_estimation[SIZE] = {0, 0};
     double speed_letterP[SIZE][SIZE] = {{100, 0},
                                   {0, 100}};
-    double speed_dt = 100;
+    double speed_dt = 1;
     double speed_renewed_e[SIZE], speed_renewed_P[SIZE][SIZE];
     double speed_measuredstate;
 
@@ -428,7 +428,7 @@ void kalmanFilter_(double measuredstate, double estimation[SIZE], double letterP
     double letterQ[SIZE][SIZE] = {{0.01, 0},
                                   {0, 0.01}};
     double letterH[MEASURE_SIZE][SIZE] = {{1, 0}};
-    double letterR[MEASURE_SIZE] = {10};
+    double letterR[MEASURE_SIZE] = {1};
 
     // 1. Predict the state and error covariance
     double predicted_e[SIZE];
