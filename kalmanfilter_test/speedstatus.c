@@ -257,13 +257,13 @@ void *dbusSendThread(void *arg)
     DBusPendingCall *speed_pending, *rpm_pending; // Pending responses from messages
     DBusMessage *speed_reply, *rpm_reply; // Store the reply received from the server
 
-    KalmanData speedKalman = {
+    KalmanState speedKalman = {
         .estimation = {0, 0},
         .P = {{100, 0}, {0, 100}},
         .dt = 1
     };
 
-    KalmanData rpmKalman = {
+    KalmanState rpmKalman = {
         .estimation = {0, 0},
         .P = {{100, 0}, {0, 100}},
         .dt = 1
