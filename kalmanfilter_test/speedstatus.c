@@ -287,6 +287,7 @@ void *dbusSendThread(void *arg)
         // Update the estimation and covariance for the next iteration
         for (int i = 0; i < SIZE; i++) {
             rpm_estimation[i] = rpm_renewed_e[i];
+            printf("Updated Estfdasfadaimation: x = %lf\n", rpm_renewed_e[i]);
             for (int j = 0; j < SIZE; j++) {
                 rpm_letterP[i][j] = rpm_renewed_P[i][j];
             }
