@@ -313,7 +313,7 @@ void *dbusSendThread(void *arg)
 
         uint8_t speed_value = (uint8_t) round(speed_renewed_e[0]);
 
-
+        printf("Calculate Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
 
 
         // Create and initialize the speed message for dbus
