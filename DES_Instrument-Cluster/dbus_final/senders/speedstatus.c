@@ -1,9 +1,11 @@
+// Include necessary headers
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h> 
 #include <string.h>
-// CAN header
+
+// Include CAN header
 #include <fcntl.h>
 #include <net/if.h>
 #include <sys/types.h>
@@ -11,97 +13,114 @@
 #include <sys/ioctl.h>
 #include <linux/can.h>
 #include <linux/can/raw.h>
-// Dbus header
+
+// Include Dbus header
 #include <stdbool.h>
 #include <ctype.h>
 #include <dbus/dbus.h>
-// Multi-thread header
+
+// Include Multi-thread header
 #include <pthread.h>
 
 #define BUFFER_SIZE 10
 
-// CAN setting
-int soc;
+// CAN configuration
+int soc;    // Variable for can socket
 typedef struct {
-    uint8_t speed;
-    uint8_t rpm;
-} CANData;
+    uint8_t speed;  // Variable to store speed info
+    uint8_t rpm;    // Variable to store rpm info
+} CANData;  // Define of CAN data sturcture
 
-CANData buffer[BUFFER_SIZE];
-int bufferIndex = 0;
-pthread_mutex_t bufferMutex = PTHREAD_MUTEX_INITIALIZER;
+CANData buffer[BUFFER_SIZE] = {0};    // Data buffer
+int bufferIndex = 0;    // Current buffer index
+pthread_mutex_t bufferMutex = PTHREAD_MUTEX_INITIALIZER;    // Mutex for the buffer
 
-int open_port(const char *port);
-void read_port(uint8_t *speed, uint8_t *rpm);
-int close_port();
+int open_port(const char *port);    // Function for open socket
+void read_port(uint8_t *speed, uint8_t *rpm);   // Function for read CAN socket
+int close_port();   // Function for close socket
 
-// Dbus setting
+// DBus configuration
 const char *const INTERFACE_NAME = "org.team4.Des02.CarInformation";
 const char *const SERVER_BUS_NAME = "org.team4.Des02";
 const char *const CLIENT_BUS_NAME = "org.team4.Des02.Client";
 const char *const SERVER_OBJECT_PATH_NAME = "/CarInformation";
 const char *const CLIENT_OBJECT_PATH_NAME = "/CarInformationClient";
 
-DBusError dbus_error;
-void print_dbus_error(char *str);
+DBusError dbus_error;   // DBusError instance
+void print_dbus_error(char *str);   // Function for print error message
 
 // Multi-thread setting
-void *readCANThread(void *arg);
-void * dbusSendThread(void *arg);
+void *readCANThread(void *arg); // Thread function for reading CAN
+void * dbusSendThread(void *arg);   // Thread fucntion for sending via DBus
 
 int main (int argc, char **argv)
 {
+    // Open the CAN port name "can0"
     open_port("can0");
 
+    // Set up the DBus connection
     DBusConnection *conn;
     dbus_error_init(&dbus_error);
     conn = dbus_bus_get(DBUS_BUS_SESSION, &dbus_error);
 
+    // Check for D-Bus connection errors
     if (dbus_error_is_set(&dbus_error))
         print_dbus_error("Connecting D-Bus Error\n");
-
     if (!conn) exit(1);
 
+    // Create threads for CAN and DBus
     pthread_t canThread, dbusThread;
     pthread_create(&canThread, NULL, readCANThread, NULL);
     pthread_create(&dbusThread, NULL, dbusSendThread, (void *)conn);
+
     pthread_join(canThread, NULL);
     pthread_join(dbusThread, NULL);
+
     close_port();
     return 0;
 }
 
 
+// CAN function definitions
 
-// CAN function
+/**
+ * @brief Opens the CAN port.
+ * 
+ * @param port The name of the port to be opened.
+ * @return Returns 0 on success, -1 on failure.
+ **/
 int open_port(const char *port)
 {
     struct ifreq ifr;
     struct sockaddr_can addr;
 
-    /* open socket */
+    // Open the socket
     soc = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (soc < 0) 
     {
-	    printf("error!");
+        printf("Error opening socket!");
         return (-1);
     }
 
     addr.can_family = AF_CAN;
     strcpy(ifr.ifr_name, port);
 
+    // Retrieve the interface index for the interface name
     if (ioctl(soc, SIOCGIFINDEX, &ifr) < 0) 
     {
-	    printf("error!");
+        printf("Error retrieving interface index!");
         return (-1);
     }
 
     addr.can_ifindex = ifr.ifr_ifindex;
+
+    // Set the socket to non-blocking mode
     fcntl(soc, F_SETFL, O_NONBLOCK);
 
+    // Bind the socket to the CAN interface
     if (bind(soc, (struct sockaddr *)&addr, sizeof(addr)) < 0) 
     {
-	    printf("binding error!");
+        printf("Error binding to the socket!");
         return (-1);
     }
 
@@ -109,33 +128,47 @@ int open_port(const char *port)
 }
 
 
+/**
+ * @brief Reads data from the CAN port.
+ * 
+ * @param speed Pointer to a variable where the speed data will be stored.
+ * @param rpm Pointer to a variable where the RPM data will be stored.
+ **/
 void read_port(uint8_t *speed, uint8_t *rpm)
 {
     struct can_frame frame;
-    frame.can_dlc = 2;
+    frame.can_dlc = 2;  // Expected Data Length Code
     int recvbytes = 0;
 
     struct timeval timeout = {1, 0};
     fd_set readSet;
     FD_ZERO(&readSet);
     FD_SET(soc, &readSet);
+
+    // Wait for data to be ready to read
     if (select((soc + 1), &readSet, NULL, NULL, &timeout) >= 0)
     {
         if (FD_ISSET(soc, &readSet))
         {
             recvbytes = read(soc, &frame, sizeof(struct can_frame));
-
+    
             if (recvbytes)
             {
+                // Process the CAN frame data to retrieve RPM and Speed
                 int disk_rpm = (frame.data[0] << 8) + frame.data[1];
                 *rpm = (uint8_t)((float)disk_rpm / 2.6);
-                *speed = (uint8_t)(*rpm * 3.4);
+                *speed = (uint8_t)(*rpm * 3.4); // mm/sec
             }
         }
     }
 }
 
 
+/**
+ * @brief Closes the CAN port.
+ * 
+ * @return Returns 0 on success.
+ **/
 int close_port()
 {
     close(soc);
@@ -143,14 +176,15 @@ int close_port()
 }
 
 
-
-// Dbus function
+// Dbus function definition
 
 void print_dbus_error (char *str) 
 {
     fprintf (stderr, "%s: %s\\n", str, dbus_error.message);
     dbus_error_free (&dbus_error);
 }
+
+// Thread function definition
 
 
 void *readCANThread(void *arg) {
