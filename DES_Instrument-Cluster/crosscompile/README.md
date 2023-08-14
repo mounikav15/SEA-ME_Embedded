@@ -151,10 +151,10 @@ rsync -avzS --rsync-path="rsync" qt5.15/ --delete <pi_username>@<pi_ip_address>:
 #### 3. Name : any name you want
 #### 4. Device type : Generic Linux Device
 #### 5. Debice : Click Manage -> Add -> Generic Linux Device -> start Wizard -> type Rasp info -> When finished, Authenitication type should be Default
-#### 6. Sysrott : Choose our handmade sysroot folder
+#### 6. Sysroot : Choose our hand-made sysroot folder
 #### 7. Compiler : Choose arm 64bit which is in usr/bin
-#### 8. Qt version : Choose qmake which is in Qt-CrossCompile-RaspberryPi/raspberrypi4/qt5.15/bin/ 
-
+#### 8. Qt version : Choose qmake which is in Qt-CrossCompile-RaspberryPi/raspberrypi4/qt5.15/bin/   
+<br>  
 
 
 ### reference: 
