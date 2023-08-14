@@ -23,12 +23,16 @@ Communication in D-Bus is done through messages. There are several types of mess
 
 ### D-Bus Daemon:  
 At the heart of D-Bus is the D-Bus daemon. This daemon routes messages between applications. There are typically two main instances of the D-Bus daemon running on a Linux system: the system bus (for system-wide services) and the session bus (for user-specific applications).
+<br>  
+<br>  
 
-## D-Bus provides several advantages, such as:  
+D-Bus provides several advantages, such as:  
 
-Decoupling: D-Bus decouples the client from the server. The client doesn't need to know any details about the server's implementation or where it's located.
-Security: D-Bus provides fine-grained security controls, allowing you to specify who can send or receive messages.
-Flexibility: D-Bus is language-agnostic, and bindings exist for several programming languages, making it versatile for various applications.
+* Decoupling: D-Bus decouples the client from the server. The client doesn't need to know any details about the server's implementation or where it's located.
+* Security: D-Bus provides fine-grained security controls, allowing you to specify who can send or receive messages.
+* Flexibility: D-Bus is language-agnostic, and bindings exist for several programming languages, making it versatile for various applications.
+<br>  
+
 Understanding these concepts is fundamental to effectively using D-Bus for inter-process communication.
 
 
