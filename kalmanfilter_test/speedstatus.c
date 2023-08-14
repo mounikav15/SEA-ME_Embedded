@@ -281,7 +281,7 @@ void *dbusSendThread(void *arg)
         printf("CAN Data - Speed: %d RPM: %d\n", speed_value_raw, rpm_value_raw);
 
         // rpm_measuredstate = (double) rpm_value_raw;
-        rpm_measuredstate = 0.0
+        rpm_measuredstate = 0.0;
 
         kalmanFilter_(rpm_measuredstate, rpm_estimation, rpm_letterP, rpm_dt, rpm_renewed_e, rpm_renewed_P);
         
