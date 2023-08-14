@@ -1,10 +1,10 @@
 # Makefile for speedstatus.c
 
-all: speedstatus
+all: speedstatus_execution
 
-speedstatus: speedstatus.c
-		gcc -Wall speedstatus.c -o speedstatus `pkg-config --cflags dbus-1` `pkg-config --libs dbus-1` -lpthread
+speedstatus_execution: speedstatus.c
+		gcc -Wall speedstatus.c -o speedstatus_execution `pkg-config --cflags dbus-1` `pkg-config --libs dbus-1` -lpthread
 
 .PHONY: clean
 clean:
-		rm -f speedstatus
+		rm -f speedstatus_execution
