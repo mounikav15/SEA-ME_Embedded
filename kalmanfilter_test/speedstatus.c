@@ -281,6 +281,22 @@ void *dbusSendThread(void *arg)
         printf("CAN Data - Speed: %d RPM: %d\n", speed_value_raw, rpm_value_raw);
 
 
+        rpm_measuredstate = (double) rpm_value_raw;
+
+        kalmanFilter_(rpm_measuredstate, rpm_estimation, rpm_letterP, rpm_dt, rpm_renewed_e, rpm_renewed_P);
+        
+        // Update the estimation and covariance for the next iteration
+        for (int i = 0; i < SIZE; i++) {
+            rpm_estimation[i] = rpm_renewed_e[i];
+            for (int j = 0; j < SIZE; j++) {
+                rpm_letterP[i][j] = rpm_renewed_P[i][j];
+            }
+        }
+        
+        printf("Updated Estimation: x = %lf\n", rpm_renewed_e[0]);
+
+        uint8_t rpm_value = (uint8_t) round(_renewed_e[0]);
+
         speed_measuredstate = (double) speed_value_raw;
 
         kalmanFilter_(speed_measuredstate, speed_estimation, speed_letterP, speed_dt, speed_renewed_e, speed_renewed_P);
@@ -296,23 +312,6 @@ void *dbusSendThread(void *arg)
         printf("Updated Estimation: x = %lf\n", speed_renewed_e[0]);
 
         uint8_t speed_value = (uint8_t) round(speed_renewed_e[0]);
-
-
-        rpm_measuredstate = (double) rpm_value_raw;
-
-        kalmanFilter_(rpm_measuredstate, rpm_estimation, rpm_letterP, rpm_dt, rpm_renewed_e, rpm_renewed_P);
-        
-        // Update the estimation and covariance for the next iteration
-        for (int i = 0; i < SIZE; i++) {
-            rpm_estimation[i] = rpm_renewed_e[i];
-            for (int j = 0; j < SIZE; j++) {
-                rpm_letterP[i][j] = rpm_renewed_P[i][j];
-            }
-        }
-        
-        printf("Updated Estimation: x = %lf\n", rpm_renewed_e[0]);
-
-        uint8_t rpm_value = (uint8_t) round(rpm_renewed_e[0]);
 
 
 
