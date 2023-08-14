@@ -32,10 +32,24 @@
 
 // Kalmanfilter configuration
 
-void kalmanFilter_(double measuredstate, double estimation[SIZE], double letterP[SIZE][SIZE], double dt, double renewed_e[SIZE], double renewed_P[SIZE][SIZE]);
+typedef struct {
+    double A[SIZE][SIZE];
+    double Q[SIZE][SIZE];
+    double H[MEASURE_SIZE][SIZE];
+    double R[MEASURE_SIZE];
+} MatrixOps;
+
+typedef struct {
+    double estimation[SIZE];
+    double P[SIZE][SIZE];
+    MatrixOps ops;
+    double dt;
+} KalmanState;
+
+
+
 void matrix_multiply(double A[SIZE][SIZE], double B[SIZE][SIZE], double result[SIZE][SIZE]);
-
-
+void kalmanFilter(double measuredstate, KalmanState* state);
 
 // CAN configuration
 int soc;    // Variable for can socket
@@ -243,13 +257,19 @@ void *dbusSendThread(void *arg)
     DBusPendingCall *speed_pending, *rpm_pending; // Pending responses from messages
     DBusMessage *speed_reply, *rpm_reply; // Store the reply received from the server
 
+    KalmanData speedKalman = {
+        .estimation = {0, 0},
+        .P = {{100, 0}, {0, 100}},
+        .dt = 1
+    };
 
-    double estimation[SIZE] = {0, 0};
-    double letterP[SIZE][SIZE] = {{100, 0},
-                                  {0, 100}};
-    double dt = 1;
-    double renewed_e[SIZE], renewed_P[SIZE][SIZE];
-    double measuredstate;
+    KalmanData rpmKalman = {
+        .estimation = {0, 0},
+        .P = {{100, 0}, {0, 100}},
+        .dt = 1
+    };
+
+    double speed_measurement, rpm_measurement
 
     while (1)  // Infinite loop to continuously send data
     {
@@ -265,32 +285,29 @@ void *dbusSendThread(void *arg)
 
         // Retrieve the most recent data from the buffer
         uint8_t speed_value_raw = buffer[currentIndex].speed;
-        uint8_t rpm_value = buffer[currentIndex].rpm;
+        uint8_t rpm_value_raw = buffer[currentIndex].rpm;
 
         // Unlock the mutex after reading data
         pthread_mutex_unlock(&bufferMutex);
 
         // Print the CAN data retrieved
-        printf("CAN Data - Speed: %d RPM: %d\n", speed_value_raw, rpm_value);
+        printf("CAN Data - Speed: %d RPM: %d\n", speed_value_raw, rpm_value_raw);
 
+        speed_measurement = (double) speed_value_raw;
 
-        measuredstate = (double) speed_value_raw;
+        kalmanFilter(speed_measurement, &speedKalman);
 
-        kalmanFilter_(measuredstate, estimation, letterP, dt, renewed_e, renewed_P);
-        
-        // Update the estimation and covariance for the next iteration
-        for (int i = 0; i < SIZE; i++) {
-            estimation[i] = renewed_e[i];
-            for (int j = 0; j < SIZE; j++) {
-                letterP[i][j] = renewed_P[i][j];
-            }
-        }
-        
-        printf("Updated Estimation: x = %lf\n", renewed_e[0]);
+        printf("Updated Speed Estimation: x = %lf\n", speedKalman.estimation[0]);
+        uint8_t speed_value = (uint8_t) round(speedKalman.estimation[0]);
 
-        uint8_t speed_value = (uint8_t) round(renewed_e[0]);
+        // Kalman filter for rpm
 
+        rpm_measurement = (double) rpm_value_raw;
 
+        kalmanFilter(rpm_measurement, &rpmKalman);
+
+        printf("Updated RPM Estimation: x = %lf\n", rpmKalman.estimation[0]);
+        uint8_t rpm_value = (uint8_t) round(rpmKalman.estimation[0]);
 
 
         // Create and initialize the speed message for dbus
@@ -391,6 +408,7 @@ void *dbusSendThread(void *arg)
 }
 
 
+
 void matrix_multiply(double A[SIZE][SIZE], double B[SIZE][SIZE], double result[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -402,64 +420,46 @@ void matrix_multiply(double A[SIZE][SIZE], double B[SIZE][SIZE], double result[S
     }
 }
 
-void kalmanFilter_(double measuredstate, double estimation[SIZE], double letterP[SIZE][SIZE], double dt, double renewed_e[SIZE], double renewed_P[SIZE][SIZE]) {
-    double letterA[SIZE][SIZE] = {{1, dt},
-                                  {0, 1}};
-    double letterQ[SIZE][SIZE] = {{0.01, 0},
-                                  {0, 0.01}};
-    double letterH[MEASURE_SIZE][SIZE] = {{1, 0}};
-    double letterR[MEASURE_SIZE] = {50};
-
+void kalmanFilter(double measuredstate, KalmanState* state) {
     // 1. Predict the state and error covariance
-    double predicted_e[SIZE];
     double temp_result[SIZE][SIZE];
-    matrix_multiply(letterA, (double (*)[SIZE])estimation, temp_result);
-    for (int i = 0; i < SIZE; i++) {
-        predicted_e[i] = temp_result[i][0];
-    }
+    matrix_multiply(state->ops.A, state->estimation, temp_result);
+    double predicted_e[SIZE] = {temp_result[0][0], temp_result[1][0]};
 
     double predicted_P[SIZE][SIZE];
-    matrix_multiply(letterA, letterP, predicted_P);
-
+    matrix_multiply(state->ops.A, state->P, predicted_P);
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            predicted_P[i][j] += letterQ[i][j];
+            predicted_P[i][j] += state->ops.Q[i][j];
         }
     }
 
     // 2. Calculate Kalman Gain
     double K[SIZE];
-    double denominator = (letterH[0][0] * predicted_P[0][0] + letterH[0][1] * predicted_P[1][0]) * letterH[0][0] 
-                         + (letterH[0][0] * predicted_P[0][1] + letterH[0][1] * predicted_P[1][1]) * letterH[0][1] + letterR[0];
+    double denominator = (state->ops.H[0][0] * predicted_P[0][0] + state->ops.H[0][1] * predicted_P[1][0]) * state->ops.H[0][0] 
+                         + (state->ops.H[0][0] * predicted_P[0][1] + state->ops.H[0][1] * predicted_P[1][1]) * state->ops.H[0][1] + state->ops.R[0];
     for (int i = 0; i < SIZE; i++) {
-        K[i] = (predicted_P[i][0] * letterH[0][0] + predicted_P[i][1] * letterH[0][1]) / denominator;
+        K[i] = (predicted_P[i][0] * state->ops.H[0][0] + predicted_P[i][1] * state->ops.H[0][1]) / denominator;
     }
 
     // 3. Update the estimation
-    double y = measuredstate - (letterH[0][0] * predicted_e[0] + letterH[0][1] * predicted_e[1]);
+    double y = measuredstate - (state->ops.H[0][0] * predicted_e[0] + state->ops.H[0][1] * predicted_e[1]);
     for (int i = 0; i < SIZE; i++) {
-        renewed_e[i] = predicted_e[i] + K[i] * y;
+        state->estimation[i] = predicted_e[i] + K[i] * y;
     }
 
     // 4. Update the error covariance
-    double I[SIZE][SIZE] = {{1, 0},
-                            {0, 1}};
-
+    double I[SIZE][SIZE] = {{1, 0}, {0, 1}};
     double KH[SIZE][SIZE];
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            KH[i][j] = K[i] * letterH[0][j];
+            KH[i][j] = K[i] * state->ops.H[0][j];
         }
     }
 
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            renewed_P[i][j] = (I[i][j] - KH[i][j]) * predicted_P[i][j];
+            state->P[i][j] = (I[i][j] - KH[i][j]) * predicted_P[i][j];
         }
     }
 }
-
-
-
-
-
