@@ -243,6 +243,7 @@ void *dbusSendThread(void *arg)
     DBusPendingCall *speed_pending, *rpm_pending; // Pending responses from messages
     DBusMessage *speed_reply, *rpm_reply; // Store the reply received from the server
 
+
     double estimation[SIZE] = {0, 0};
     double letterP[SIZE][SIZE] = {{100, 0},
                                   {0, 100}};
@@ -276,7 +277,7 @@ void *dbusSendThread(void *arg)
         measuredstate = (double) speed_value;
 
         kalmanFilter_(measuredstate, estimation, letterP, dt, renewed_e, renewed_P);
-
+        
         // Update the estimation and covariance for the next iteration
         for (int i = 0; i < SIZE; i++) {
             estimation[i] = renewed_e[i];
@@ -386,8 +387,6 @@ void *dbusSendThread(void *arg)
 }
 
 
-
-
 void matrix_multiply(double A[SIZE][SIZE], double B[SIZE][SIZE], double result[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -409,7 +408,11 @@ void kalmanFilter_(double measuredstate, double estimation[SIZE], double letterP
 
     // 1. Predict the state and error covariance
     double predicted_e[SIZE];
-    matrix_multiply(letterA, estimation, predicted_e);
+    double temp_result[SIZE][SIZE];
+    matrix_multiply(letterA, (double (*)[SIZE])estimation, temp_result);
+    for (int i = 0; i < SIZE; i++) {
+        predicted_e[i] = temp_result[i][0];
+    }
 
     double predicted_P[SIZE][SIZE];
     matrix_multiply(letterA, letterP, predicted_P);
@@ -451,5 +454,8 @@ void kalmanFilter_(double measuredstate, double estimation[SIZE], double letterP
         }
     }
 }
+
+
+
 
 
