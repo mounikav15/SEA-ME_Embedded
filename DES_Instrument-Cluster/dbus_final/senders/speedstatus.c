@@ -161,11 +161,11 @@ void *readCANThread(void *arg) {
         // printf("CAN Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
 
         pthread_mutex_lock(&bufferMutex);
-        if (bufferIndex < BUFFER_SIZE) {
-            buffer[bufferIndex].speed = speed_value;
-            buffer[bufferIndex].rpm = rpm_value;
-            bufferIndex++;
-        }
+
+        buffer[bufferIndex].speed = speed_value;
+        buffer[bufferIndex].rpm = rpm_value;
+        bufferIndex = (bufferIndex + 1)%BUFFER_SIZE;
+
         pthread_mutex_unlock(&bufferMutex);
     }
     return NULL;
@@ -177,94 +177,100 @@ void *dbusSendThread(void *arg) {
     DBusMessageIter speed_args, rpm_args;
     DBusPendingCall *speed_pending, *rpm_pending;
 
-    while (1) {
+    while (1) 
+    {
         pthread_mutex_lock(&bufferMutex);
-        if (bufferIndex > 0) {
-            uint8_t speed_value = buffer[bufferIndex - 1].speed;
-            uint8_t rpm_value = buffer[bufferIndex - 1].rpm;
-            bufferIndex--;
-            pthread_mutex_unlock(&bufferMutex);
 
-            printf("CAN Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
+        int currentIndex = bufferIndex - 1;
 
-            // Send speed_value
-            speed_msg = dbus_message_new_method_call(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, "setSpeed");
-            if (NULL == speed_msg) { 
-                fprintf(stderr, "Speed Message Null\n");
-                exit(1);
-            }
-            dbus_message_iter_init_append(speed_msg, &speed_args);
-            if (!dbus_message_iter_append_basic(&speed_args, DBUS_TYPE_BYTE, &speed_value)) {
-                fprintf(stderr, "Out Of Memory for setSpeed!\n");
-                exit(1);
-            }
-
-            if (!dbus_connection_send_with_reply(conn, speed_msg, &speed_pending, -1)) { 
-                fprintf(stderr, "Out Of Memory for setSpeed!\n"); 
-                exit(1);
-            }
-            if (NULL == speed_pending) { 
-                fprintf(stderr, "Speed Pending Call Null\n"); 
-                exit(1);
-            }
-            dbus_connection_flush(conn);
-            dbus_message_unref(speed_msg);
-
-            dbus_pending_call_block(speed_pending);
-            speed_msg = dbus_pending_call_steal_reply(speed_pending);
-            if (NULL == speed_msg) {
-                fprintf(stderr, "Speed Reply Null\n");
-                exit(1);
-            }
-            char *speed_reply_msg;
-            if (dbus_message_get_args(speed_msg, &dbus_error, DBUS_TYPE_STRING, &speed_reply_msg, DBUS_TYPE_INVALID)) {
-                printf("setSpeed Reply: %s\n", speed_reply_msg);
-            }
-            dbus_message_unref(speed_msg);
-            dbus_pending_call_unref(speed_pending);
-
-            // Send rpm_value
-            rpm_msg = dbus_message_new_method_call(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, "setRpm");
-            if (NULL == rpm_msg) { 
-                fprintf(stderr, "RPM Message Null\n");
-                exit(1);
-            }
-            dbus_message_iter_init_append(rpm_msg, &rpm_args);
-            if (!dbus_message_iter_append_basic(&rpm_args, DBUS_TYPE_BYTE, &rpm_value)) {
-                fprintf(stderr, "Out Of Memory for setRpm!\n");
-                exit(1);
-            }
-
-            if (!dbus_connection_send_with_reply(conn, rpm_msg, &rpm_pending, -1)) { 
-                fprintf(stderr, "Out Of Memory for setRpm!\n"); 
-                exit(1);
-            }
-            if (NULL == rpm_pending) { 
-                fprintf(stderr, "RPM Pending Call Null\n"); 
-                exit(1);
-            }
-            dbus_connection_flush(conn);
-            dbus_message_unref(rpm_msg);
-
-            dbus_pending_call_block(rpm_pending);
-            rpm_msg = dbus_pending_call_steal_reply(rpm_pending);
-            if (NULL == rpm_msg) {
-                fprintf(stderr, "RPM Reply Null\n");
-                exit(1);
-            }
-            char *rpm_reply_msg;
-            if (dbus_message_get_args(rpm_msg, &dbus_error, DBUS_TYPE_STRING, &rpm_reply_msg, DBUS_TYPE_INVALID)) {
-                printf("setRpm Reply: %s\n", rpm_reply_msg);
-            }
-            dbus_message_unref(rpm_msg);
-            dbus_pending_call_unref(rpm_pending);
-
-            usleep(500000);
-
-        } else {
-            pthread_mutex_unlock(&bufferMutex);
-            usleep(1000);
+        if (currentIndex < 0)
+        {
+            currentIndex = BUFFER_SIZE - 1;
         }
+
+        uint8_t speed_value = buffer[currentIndex].speed;
+        uint8_t rpm_value = buffer[currentIndex].rpm;
+
+
+        pthread_mutex_unlock(&bufferMutex);
+
+        printf("CAN Data - Speed: %d RPM: %d\n", speed_value, rpm_value);
+
+        // Send speed_value
+        speed_msg = dbus_message_new_method_call(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, "setSpeed");
+        if (NULL == speed_msg) { 
+            fprintf(stderr, "Speed Message Null\n");
+            exit(1);
+        }
+        dbus_message_iter_init_append(speed_msg, &speed_args);
+        if (!dbus_message_iter_append_basic(&speed_args, DBUS_TYPE_BYTE, &speed_value)) {
+            fprintf(stderr, "Out Of Memory for setSpeed!\n");
+            exit(1);
+        }
+
+        if (!dbus_connection_send_with_reply(conn, speed_msg, &speed_pending, -1)) { 
+            fprintf(stderr, "Out Of Memory for setSpeed!\n"); 
+            exit(1);
+        }
+        if (NULL == speed_pending) { 
+            fprintf(stderr, "Speed Pending Call Null\n"); 
+            exit(1);
+        }
+        dbus_connection_flush(conn);
+        dbus_message_unref(speed_msg);
+
+        dbus_pending_call_block(speed_pending);
+        speed_msg = dbus_pending_call_steal_reply(speed_pending);
+        if (NULL == speed_msg) {
+            fprintf(stderr, "Speed Reply Null\n");
+            exit(1);
+        }
+        char *speed_reply_msg;
+        if (dbus_message_get_args(speed_msg, &dbus_error, DBUS_TYPE_STRING, &speed_reply_msg, DBUS_TYPE_INVALID)) {
+            printf("setSpeed Reply: %s\n", speed_reply_msg);
+        }
+        dbus_message_unref(speed_msg);
+        dbus_pending_call_unref(speed_pending);
+
+        // Send rpm_value
+        rpm_msg = dbus_message_new_method_call(SERVER_BUS_NAME, SERVER_OBJECT_PATH_NAME, INTERFACE_NAME, "setRpm");
+        if (NULL == rpm_msg) { 
+            fprintf(stderr, "RPM Message Null\n");
+            exit(1);
+        }
+        dbus_message_iter_init_append(rpm_msg, &rpm_args);
+        if (!dbus_message_iter_append_basic(&rpm_args, DBUS_TYPE_BYTE, &rpm_value)) {
+            fprintf(stderr, "Out Of Memory for setRpm!\n");
+            exit(1);
+        }
+
+        if (!dbus_connection_send_with_reply(conn, rpm_msg, &rpm_pending, -1)) { 
+            fprintf(stderr, "Out Of Memory for setRpm!\n"); 
+            exit(1);
+        }
+        if (NULL == rpm_pending) { 
+            fprintf(stderr, "RPM Pending Call Null\n"); 
+            exit(1);
+        }
+        dbus_connection_flush(conn);
+        dbus_message_unref(rpm_msg);
+
+        dbus_pending_call_block(rpm_pending);
+        rpm_msg = dbus_pending_call_steal_reply(rpm_pending);
+        if (NULL == rpm_msg) {
+            fprintf(stderr, "RPM Reply Null\n");
+            exit(1);
+        }
+        char *rpm_reply_msg;
+        if (dbus_message_get_args(rpm_msg, &dbus_error, DBUS_TYPE_STRING, &rpm_reply_msg, DBUS_TYPE_INVALID)) {
+            printf("setRpm Reply: %s\n", rpm_reply_msg);
+        }
+        dbus_message_unref(rpm_msg);
+        dbus_pending_call_unref(rpm_pending);
+
+        usleep(500000);
+
     }
+
     return NULL;
 }
