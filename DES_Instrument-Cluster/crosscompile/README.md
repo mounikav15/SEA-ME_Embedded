@@ -141,6 +141,22 @@ cd ~/Documents/Qt-CrossCompile-RaspberryPi/raspberrypi4
 rsync -avzS --rsync-path="rsync" qt5.15/ --delete <pi_username>@<pi_ip_address>:/usr/local/qt5.15/
 ```
 
+
+### Setting new compiler in Qt
+#### We use Qt creator version 4.15.0 version
+##### [Qt creator 4.15.0](https://download.qt.io/archive/qtcreator/4.15/4.15.0/)
+
+#### 1. Go to menubar, Tools -> External -> Configure -> Kits
+#### 2. Click Add
+#### 3. Name : any name you want
+#### 4. Device type : Generic Linux Device
+#### 5. Debice : Click Manage -> Add -> Generic Linux Device -> start Wizard -> type Rasp info -> When finished, Authenitication type should be Default
+#### 6. Sysrott : Choose our handmade sysroot folder
+#### 7. Compiler : Choose arm 64bit which is in usr/bin
+#### 8. Qt version : Choose qmake which is in Qt-CrossCompile-RaspberryPi/raspberrypi4/qt5.15/bin/ 
+
+
+
 ### reference: 
 #### 1. [QT 5.15 CROSS COMPILE FOR RASPBERRY COMPUTE MODULE 4 ON UBUNTU 20 LTS](https://www.interelectronix.com/qt-515-cross-compilation-raspberry-compute-module-4-ubuntu-20-lts.html)
 #### 2. [Cross-Compile Qt 6 for Raspberry Pi](https://wiki.qt.io/Cross-Compile_Qt_6_for_Raspberry_Pi)
