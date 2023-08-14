@@ -210,6 +210,7 @@ void *dbusSendThread(void *arg) {
     DBusMessage *speed_msg, *rpm_msg;
     DBusMessageIter speed_args, rpm_args;
     DBusPendingCall *speed_pending, *rpm_pending;
+    DBusMessage *speed_reply, *rpm_reply;
 
     while (1) 
     {
@@ -254,16 +255,16 @@ void *dbusSendThread(void *arg) {
         dbus_message_unref(speed_msg);
 
         dbus_pending_call_block(speed_pending);
-        speed_msg = dbus_pending_call_steal_reply(speed_pending);
-        if (NULL == speed_msg) {
+        speed_reply = dbus_pending_call_steal_reply(speed_pending);
+        if (NULL == speed_reply) {
             fprintf(stderr, "Speed Reply Null\n");
             exit(1);
         }
         char *speed_reply_msg;
-        if (dbus_message_get_args(speed_msg, &dbus_error, DBUS_TYPE_STRING, &speed_reply_msg, DBUS_TYPE_INVALID)) {
+        if (dbus_message_get_args(speed_reply, &dbus_error, DBUS_TYPE_STRING, &speed_reply_msg, DBUS_TYPE_INVALID)) {
             printf("setSpeed Reply: %s\n", speed_reply_msg);
         }
-        dbus_message_unref(speed_msg);
+        dbus_message_unref(speed_reply);
         dbus_pending_call_unref(speed_pending);
 
         // Send rpm_value
@@ -290,16 +291,16 @@ void *dbusSendThread(void *arg) {
         dbus_message_unref(rpm_msg);
 
         dbus_pending_call_block(rpm_pending);
-        rpm_msg = dbus_pending_call_steal_reply(rpm_pending);
-        if (NULL == rpm_msg) {
+        rpm_reply = dbus_pending_call_steal_reply(rpm_pending);
+        if (NULL == rpm_reply) {
             fprintf(stderr, "RPM Reply Null\n");
             exit(1);
         }
         char *rpm_reply_msg;
-        if (dbus_message_get_args(rpm_msg, &dbus_error, DBUS_TYPE_STRING, &rpm_reply_msg, DBUS_TYPE_INVALID)) {
+        if (dbus_message_get_args(rpm_reply, &dbus_error, DBUS_TYPE_STRING, &rpm_reply_msg, DBUS_TYPE_INVALID)) {
             printf("setRpm Reply: %s\n", rpm_reply_msg);
         }
-        dbus_message_unref(rpm_msg);
+        dbus_message_unref(rpm_reply);
         dbus_pending_call_unref(rpm_pending);
 
         usleep(500000);
