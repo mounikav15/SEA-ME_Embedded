@@ -428,7 +428,7 @@ void kalmanFilter_(double measuredstate, double estimation[SIZE], double letterP
     double letterQ[SIZE][SIZE] = {{0.01, 0},
                                   {0, 0.01}};
     double letterH[MEASURE_SIZE][SIZE] = {{1, 0}};
-    double letterR[MEASURE_SIZE] = {50};
+    double letterR[MEASURE_SIZE] = {10};
 
     // 1. Predict the state and error covariance
     double predicted_e[SIZE];
