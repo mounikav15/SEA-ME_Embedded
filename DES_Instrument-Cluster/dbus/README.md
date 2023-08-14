@@ -36,7 +36,7 @@ D-Bus provides several advantages, such as:
 Understanding these concepts is fundamental to effectively using D-Bus for inter-process communication.
 
 
-# How to Use These Codes  
+# Usages  
 ### C Implementation:  
 * add-client.c: Contains the C implementation of a D-Bus client.  
 * add-server.c: Contains the C implementation of a D-Bus server. 
