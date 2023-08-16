@@ -2,7 +2,7 @@
 
 # Result
 
-<img src="Images/final_result" alt="Alt text" width="50%" height="50%"/>
+<img src="Images/final_result.png" alt="Alt text" width="50%" height="50%"/>
 
 
 # Introduction
